@@ -211,6 +211,27 @@ static void load_configuration(void) {
       manual_field_time_minutes);
 }
 
+static void start_automatic_countdown(void) {
+  int16_t auto_field_time_seconds = 60 * auto_field_time_minutes;
+  int16_t reference_time_utc_seconds = 60 * reference_time_utc;
+  continuous_count_down = std::make_unique<ContinuousCountdown>(
+      SQUARE_WAVE_PIN,
+      auto_field_time_seconds,
+      all_red_period,
+      reference_time_utc_seconds,
+      command_queue);
+
+  int16_t sync_time_seconds =
+      reference_time_utc_seconds % auto_field_time_seconds;
+  int16_t rump_offset_time =
+      ds3231.seconds_since_midnight() % auto_field_time_seconds;
+  if (sync_time_seconds < rump_offset_time) {
+    sync_time_seconds += auto_field_time_seconds;
+  }
+  continuous_count_down->enable(
+      sync_time_seconds - rump_offset_time);
+}
+
 void setup() {
   pinMode(BUILTIN_LED_PIN, OUTPUT);
   digitalWrite(BUILTIN_LED_PIN, LOW);
@@ -279,13 +300,8 @@ void setup() {
 
   vTaskDelay(pdMS_TO_TICKS(10000));
 
-  continuous_count_down = std::make_unique<ContinuousCountdown>(
-      SQUARE_WAVE_PIN,
-      60 * auto_field_time_minutes,
-      all_red_period,
-      60 * reference_time_utc,
-      command_queue);
-  continuous_count_down->enable(ds3231.seconds_since_midnight());
+  start_automatic_countdown();
+
   Serial.println("Setup complete.");
 }
 

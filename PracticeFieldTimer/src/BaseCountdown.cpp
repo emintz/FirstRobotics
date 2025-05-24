@@ -23,10 +23,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <src/BaseCountdown.h>
+#include "BaseCountdown.h"
 #include "NotifyFromISR.h"
 #include "TaskPriorities.h"
 #include "VacuousVoidFunction.h"
+
+void BaseCountdown::maybe_set_initial_duration(int16_t initial_duration_seconds)  {
+  if (0 < initial_duration_seconds) {
+    timer->set_remaining(initial_duration_seconds);
+  }
+
+  Serial.printf("Initial duration: %d.\n", (int) initial_duration_seconds);
+}
 
 BaseCountdown::BaseCountdown(
     uint8_t sqw_pin,
@@ -57,18 +65,18 @@ BaseCountdown::BaseCountdown(
 BaseCountdown::~BaseCountdown() {
 }
 
-void BaseCountdown::enable(int seconds_since_midnight) {
+void BaseCountdown::enable(int initial_duration_seconds) {
   switch (state) {
   case State::CREATED:
-    // TODO(emintz): set initial duration. Set it to the full duration for now
-    timer->set_remaining(duration_in_seconds);
+    maybe_set_initial_duration(
+        static_cast<int16_t>(initial_duration_seconds));
     task->start();
     sqw_detector->start();
     state = State::RUNNING;
     break;
   case State::PAUSED:
-    // TODO(emintz): set initial duration. Set it to the full duration for now
-    timer->set_remaining(duration_in_seconds);
+    maybe_set_initial_duration(
+        static_cast<int16_t>(initial_duration_seconds));
     task->start();
     sqw_detector->start();
     state = State::RUNNING;

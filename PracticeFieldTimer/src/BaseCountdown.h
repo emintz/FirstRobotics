@@ -56,6 +56,23 @@ class BaseCountdown {
   std::unique_ptr<GpioChangeDetector> sqw_detector;
   std::unique_ptr<TaskWithActionH> task;
 
+  /*
+   * Sets the duration of the next count down if
+   * the provided duration is greater than 0. Does
+   * nothing otherwise. This method SHOULD only be
+   * invoked when the counter is disabled. This
+   * is not enforced.
+   *
+   * Parameters:
+   * ----------
+   *
+   * Name                     Contents
+   * -----------------        --------------------------------------------
+   * initial_duration_seconds Count down length in seconds. Ignored
+   *                          if <= 0.
+   */
+  void maybe_set_initial_duration(int16_t initial_duration_seconds);
+
 protected:
   /*
    * Constructs a newly initialized instance.
@@ -91,10 +108,24 @@ protected:
 public:
   virtual ~BaseCountdown();
 
-  void begin(int16_t seconds_since_midnight);
+  /*
+   * Enable (i.e.) start the counter and optionally
+   * synchronize it to the current time. The one-shot
+   * count down ignores the parameter.
+   *
+   * Parameters:
+   * ----------
+   *
+   * Name                   Contents
+   * -----------------      ------------------------------------------------
+   * seconds_since_midnight Current time (UTC) in seconds since 0000.
+   *                        One shot timers ignore this value.
+   */
+  void enable(int seconds_since_midnight = 0);
 
-  void enable(int seconds_since_midnight);
-
+  /*
+   * Disable (i.e.) stop the counter
+   */
   void disable(void);
 };
 

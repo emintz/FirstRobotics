@@ -46,7 +46,6 @@ struct DisplayCommand {
 
   Pattern command;
   Color foreground;
-  Color background;
   int16_t time_in_seconds;
 };
 
