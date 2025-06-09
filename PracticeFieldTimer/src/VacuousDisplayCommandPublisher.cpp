@@ -1,7 +1,7 @@
 /*
- * DS3231TimeSource.cpp
+ * VacuousDisplayCommandPublisher.cpp
  *
- *  Created on: May 19, 2025
+ *  Created on: Jun 9, 2025
  *      Author: Eric Mintz
  *
  * Copyright (C) 2025 Eric Mintz
@@ -21,23 +21,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "DS3231TimeSource.h"
+#include "VacuousDisplayCommandPublisher.h"
 
-DS3231_TimeSource::DS3231_TimeSource() {
+VacuousDisplayCommandPublisher::~VacuousDisplayCommandPublisher() {
 }
 
-DS3231_TimeSource::~DS3231_TimeSource() {
-}
-
-bool DS3231_TimeSource::begin(void) {
-  bool status = ds3231.begin();
-  if (status) {
-    ds3231.writeSqwPinMode(DS3231_SquareWave1Hz);
-  }
-  return status;
-}
-
-int DS3231_TimeSource::seconds_since_midnight(void) {
-  auto now = ds3231.now();
-  return now.hour() * 3600 + now.minute() * 60 + now.second();
+void VacuousDisplayCommandPublisher::operator()(const DisplayCommand& command_to_publish) {
 }

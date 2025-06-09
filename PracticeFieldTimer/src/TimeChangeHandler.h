@@ -1,11 +1,13 @@
 /*
- * DisplayDrivers.h
+ * TimeChangeHandler.h
  *
- *  Created on: May 15, 2025
+ *  Created on: Jun 9, 2025
  *      Author: Eric Mintz
  *
- * Maintains a map of display drivers (classes that drive the LED matrix)
- * and makes them available for use.
+ * Handle incoming time change messages. This handler should
+ * be active ONLY on followers. However, since a sending node
+ * does not receive its own messages (under normal conditions,
+ * anyway), it should be safe to run this on the leader.
  *
  * Copyright (C) 2025 Eric Mintz
  * All Rights Reserved
@@ -24,24 +26,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef DISPLAYDRIVERS_H_
-#define DISPLAYDRIVERS_H_
+#ifndef TIMECHANGEHANDLER_H_
+#define TIMECHANGEHANDLER_H_
 
+#include "CanPayloadHandler.h"
 #include "DisplayCommand.h"
-#include "DisplayDriver.h"
+#include "PullQueueHT.h"
 
-#include <map>
-#include <memory>
+class CanBus;
+class CanPayload;
 
-class DisplayDrivers {
-  std::map<DisplayCommand::Pattern, std::shared_ptr<DisplayDriver>> driver_map;
-  DisplayDrivers();
+class TimeChangeHandler final : public CanPayloadHandler {
+  PullQueueHT<DisplayCommand>& panel_command_queue;
+
 public:
-  virtual ~DisplayDrivers();
+  TimeChangeHandler(
+      PullQueueHT<DisplayCommand>& panel_command_queue);
+  virtual ~TimeChangeHandler();
 
-  static DisplayDrivers drivers;
-
-  std::shared_ptr<DisplayDriver> operator[](const DisplayCommand::Pattern pattern);
+  virtual void operator() (CanBus& bus, CanPayload& payload);
 };
 
-#endif /* DISPLAYDRIVERS_H_ */
+#endif /* TIMECHANGEHANDLER_H_ */

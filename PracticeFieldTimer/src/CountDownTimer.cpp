@@ -4,11 +4,6 @@
  *  Created on: May 19, 2025
  *      Author: Eric Mintz
  *
- * Low level count down implementation that runs a single cycle then
- * invokes a count down completion action.
- *
- * Main program for the FIRST Robotics competition practice field.
- *
  * Copyright (C) 2025 Eric Mintz
  * All Rights Reserved
  *
@@ -31,6 +26,11 @@
 
 #include "VoidFunction.h"
 
+void CountDownTimer::publish_command(DisplayCommand& display_command) {
+  command_queue.send_message(&display_command);
+
+}
+
 void CountDownTimer::show_blink_time(void) {
   DisplayCommand display_command;
   memset(&display_command, 0, sizeof(display_command));
@@ -40,7 +40,7 @@ void CountDownTimer::show_blink_time(void) {
       : DisplayCommand::Pattern::FAST_BLINK_TIME;
   display_command.time_in_seconds = seconds_remaining;
   display_command.foreground.red = 63;
-  command_queue.send_message(&display_command);
+  publish_command(display_command);
  }
 
 void CountDownTimer::show_plain_time(void) {
@@ -62,7 +62,7 @@ void CountDownTimer::show_plain_time(void) {
       display_command.foreground.blue = blue_intensity;
       display_command.foreground.green = 63 - display_command.foreground.blue;
     }
-    command_queue.send_message(&display_command);
+  publish_command(display_command);
 }
 
 CountDownTimer::CountDownTimer(

@@ -8,12 +8,9 @@
  * set during creation, and can be overridden for the first cycle that
  * runs. This allows the start of free-running cycles to be synchronized
  * with a specified start time.
-  *
- * A count down that runs continuously. The countdown start is pinned
- * to a start time that is specified at construction. All times
- * *should* be in UTC.
  *
- * Main program for the FIRST Robotics competition practice field.
+ * The timer counts down to zero and then signals completion by invoking
+ * a VoidFunction that is set during construction.
  *
  * Copyright (C) 2025 Eric Mintz
  * All Rights Reserved
@@ -52,6 +49,8 @@ class CountDownTimer : public TaskAction {
   const int16_t color_change_halfway_mark;
   const int16_t fast_blink_start;
   const int16_t slow_blink_start;
+
+  void publish_command(DisplayCommand& display_command);
 
   void show_blink_time(void);
 

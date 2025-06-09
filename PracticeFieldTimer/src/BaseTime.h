@@ -6,8 +6,6 @@
  *
  * Base class for time display. Provides utility functions.
  *
- * Main program for the FIRST Robotics competition practice field.
- *
  * Copyright (C) 2025 Eric Mintz
  * All Rights Reserved
  *

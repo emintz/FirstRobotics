@@ -4,8 +4,6 @@
  *  Created on: May 19, 2025
  *      Author: Eric Mintz
  *
- * Main program for the FIRST Robotics competition practice field.
- *
  * Copyright (C) 2025 Eric Mintz
  * All Rights Reserved
  *

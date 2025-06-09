@@ -1,9 +1,11 @@
 /*
- * DS3231TimeSource.cpp
+ * CANDisplayCommandPublisher.h
  *
- *  Created on: May 19, 2025
+ *  Created on: Jun 9, 2025
  *      Author: Eric Mintz
  *
+ * Sends the display time to followers. Only the
+ * leading countdown timer invoke this class.
  * Copyright (C) 2025 Eric Mintz
  * All Rights Reserved
  *
@@ -21,23 +23,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "DS3231TimeSource.h"
+#ifndef CANDISPLAYCOMMANDPUBLISHER_H_
+#define CANDISPLAYCOMMANDPUBLISHER_H_
 
-DS3231_TimeSource::DS3231_TimeSource() {
-}
+#include "DisplayCommandPublisher.h"
 
-DS3231_TimeSource::~DS3231_TimeSource() {
-}
+class CanBus;
+class DisplayCommand;
 
-bool DS3231_TimeSource::begin(void) {
-  bool status = ds3231.begin();
-  if (status) {
-    ds3231.writeSqwPinMode(DS3231_SquareWave1Hz);
-  }
-  return status;
-}
+class CANDisplayCommandPublisher final :
+    public DisplayCommandPublisher {
+  CanBus& can_bus;
 
-int DS3231_TimeSource::seconds_since_midnight(void) {
-  auto now = ds3231.now();
-  return now.hour() * 3600 + now.minute() * 60 + now.second();
-}
+public:
+  CANDisplayCommandPublisher(CanBus& can_bus);
+
+  virtual void operator()(const DisplayCommand& command);
+};
+
+#endif /* CANDISPLAYCOMMANDPUBLISHER_H_ */

@@ -25,6 +25,9 @@
 #include "Arduino.h"
 
 #include "BlinkErrorCodes.h"
+#include "CanBus.h"
+#include "CANDisplayCommandPublisher.h"
+#include "CanEnumerations.h"
 #include "Configurator.h"
 #include "ContinuousCountdown.h"
 #include "DataTypes.h"
@@ -38,6 +41,8 @@
 #include "PullQueueHT.h"
 #include "TaskPriorities.h"
 #include "TaskWithActionH.h"
+#include "TimeChangeHandler.h"
+#include "VacuousDisplayCommandPublisher.h"
 #include "WS2812B8x32vertical.h"
 
 #include <WiFi.h>
@@ -81,9 +86,12 @@ static TaskWithActionH server_task(
     &server,
     4096);
 
-//static VacuousVoidFunction do_nothing;
-
 static std::unique_ptr<ContinuousCountdown> continuous_count_down;
+
+static TimeChangeHandler incoming_time_change_handler(command_queue);
+static CanBus can_bus(CAN_RECEIVE_PIN, CAN_TRANSMIT_PIN, CanBusSpeed::BPS_100K);
+static CANDisplayCommandPublisher to_can_bus(can_bus);
+
 
 static void blink_it(int pin_no) {
   for (int i = 0; i < 4; ++i) {
@@ -107,6 +115,10 @@ static void wifi_on(void) {
   }
 }
 
+/*
+ * Read the configuration parameter values from the web
+ * service and persist them in NVS.
+ */
 static void set_configuration_parameters(void) {
   Configurator configurator(nvs_namespace);
   DataTypes data_types;
@@ -138,6 +150,12 @@ static void wifi_off(void) {
   }
 }
 
+/*
+ * Enable the configuration setup web page if the user
+ * requests it by pressing and holding the
+ * SET_CONFIGURATION_PIN (see PinAssignments.h) during
+ * startup.
+ */
 static void configure_if_requested(void) {
   pinMode(SET_CONFIGURATION_PIN, INPUT_PULLUP);
   PressAndHold configuration_signal(
@@ -153,6 +171,22 @@ static void configure_if_requested(void) {
   }
 }
 
+/*
+ * Read an int32 value from NVS.
+ *
+ * Parameters:
+ * ----------
+ *
+ * Name                 Contents
+ * -----------------    ------------------------------------------------
+ * eeprom               The NVS namespace containing the configuration,
+ *                      opened for read-only.
+ * key                  NULL-terminated value key. Cannot be NULL or
+ *                      empty.
+ * value                Receives the parameter value, if found,
+ *                      contents unspecified if the parameter is
+ *                      missing.
+ */
 static void read_eeprom(
     Flash32ReadOnlyNamespace &eeprom,
     const char *key,
@@ -171,6 +205,9 @@ static void read_eeprom(
   }
 }
 
+/*
+ * Load the configuration from NVS.
+ */
 static void load_configuration(void) {
   Serial.println("Loading configuration.");
   if (!Flash32.begin()) {
@@ -211,6 +248,14 @@ static void load_configuration(void) {
       manual_field_time_minutes);
 }
 
+/*
+ * Start the continuously running automatic countdown. This method
+ * should be invoked if and only if the automatic countdown is
+ * configured to run.
+ *
+ * TODO: write a corresponding method to enable manually-started
+ *       countdown.
+ */
 static void start_automatic_countdown(void) {
   int16_t auto_field_time_seconds = 60 * auto_field_time_minutes;
   int16_t reference_time_utc_seconds = 60 * reference_time_utc;

@@ -6,12 +6,6 @@
  *
  * Character bitmaps
  *
- * A count down that runs continuously. The countdown start is pinned
- * to a start time that is specified at construction. All times
- * *should* be in UTC.
- *
- * Main program for the FIRST Robotics competition practice field.
- *
  * Copyright (C) 2025 Eric Mintz
  * All Rights Reserved
  *

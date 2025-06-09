@@ -27,6 +27,7 @@
 #include "DisplayDriver.h"
 #include "DisplayDrivers.h"
 #include "LedPanel.h"
+#include "VacuousDisplayCommandPublisher.h"
 
 #include <memory>
 

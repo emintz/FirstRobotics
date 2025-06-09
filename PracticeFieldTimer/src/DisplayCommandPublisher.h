@@ -1,8 +1,10 @@
 /*
- * DS3231TimeSource.cpp
+ * DisplayCommandPublisher.h
  *
- *  Created on: May 19, 2025
+ *  Created on: Jun 9, 2025
  *      Author: Eric Mintz
+ *
+ * Provides an API for publishing display commands.
  *
  * Copyright (C) 2025 Eric Mintz
  * All Rights Reserved
@@ -21,23 +23,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "DS3231TimeSource.h"
+#ifndef DISPLAYCOMMANDPUBLISHER_H_
+#define DISPLAYCOMMANDPUBLISHER_H_
 
-DS3231_TimeSource::DS3231_TimeSource() {
-}
+class DisplayCommand;
 
-DS3231_TimeSource::~DS3231_TimeSource() {
-}
+class DisplayCommandPublisher {
+public:
+  virtual void operator()(const DisplayCommand& command_to_publish) = 0;
+};
 
-bool DS3231_TimeSource::begin(void) {
-  bool status = ds3231.begin();
-  if (status) {
-    ds3231.writeSqwPinMode(DS3231_SquareWave1Hz);
-  }
-  return status;
-}
-
-int DS3231_TimeSource::seconds_since_midnight(void) {
-  auto now = ds3231.now();
-  return now.hour() * 3600 + now.minute() * 60 + now.second();
-}
+#endif /* DISPLAYCOMMANDPUBLISHER_H_ */
