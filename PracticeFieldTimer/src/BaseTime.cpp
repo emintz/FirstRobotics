@@ -28,7 +28,6 @@
 #include "PinAssignments.h"
 
 void BaseTime::clear(LedPanel& panel) {
-  digitalWrite(RED_LED_PIN, LOW);
   panel.clear().update();
 }
 
@@ -74,7 +73,6 @@ void BaseTime::display_colon(
 void BaseTime::show_time(
       const DisplayCommand& command,
       LedPanel& panel) {
-  digitalWrite(RED_LED_PIN, HIGH);
   panel.clear();
 
   int minutes = command.time_in_seconds / 60;

@@ -282,8 +282,12 @@ void setup() {
   digitalWrite(BUILTIN_LED_PIN, LOW);
   pinMode(RED_LED_PIN, OUTPUT);
   digitalWrite(RED_LED_PIN, LOW);
+  pinMode(YELLOW_LED_PIN, OUTPUT);
+  digitalWrite(YELLOW_LED_PIN, LOW);
   pinMode(GREEN_LED_PIN, OUTPUT);
   digitalWrite(GREEN_LED_PIN, LOW);
+  pinMode(CAN_ENABLE_NOT_PIN, INPUT_PULLUP);
+  pinMode(FOLLOW_ENABLE_NOT_PIN, INPUT_PULLUP);
   pinMode(SQUARE_WAVE_PIN, INPUT);
 
   Serial.begin(115200);
@@ -291,6 +295,7 @@ void setup() {
 
   blink_it(BUILTIN_LED_PIN);
   blink_it(RED_LED_PIN);
+  blink_it(YELLOW_LED_PIN);
   blink_it(GREEN_LED_PIN);
 
   if (!Wire.begin()) {
