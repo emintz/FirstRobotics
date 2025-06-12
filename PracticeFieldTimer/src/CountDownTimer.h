@@ -38,6 +38,7 @@
 #include "PullQueueHT.h"
 #include "TaskAction.h"
 
+class DisplayCommandPublisher;
 class VoidFunction;
 
 class CountDownTimer : public TaskAction {
@@ -49,23 +50,64 @@ class CountDownTimer : public TaskAction {
   const int16_t color_change_halfway_mark;
   const int16_t fast_blink_start;
   const int16_t slow_blink_start;
+  DisplayCommandPublisher& command_publisher;
 
+  /*
+   * Publish the command to the panel service and, if the CAN bus is
+   * running, to the CAN bus as well.
+   */
   void publish_command(DisplayCommand& display_command);
 
+  /*
+   * Create and publish a command to display the time, blinking
+   * the display to attract attention. Time is displayed in red.
+   * This is only done during the countdown's end stage, which
+   * is set at construction.
+   */
   void show_blink_time(void);
 
+  /*
+   * Create and publish a command to display the time steadily, i.e.
+   * without blinking it. Vary the display color from blue to
+   * red depending on the remaining time. This is done during all
+   * but the end phase of a session, which is set at construction.
+   */
   void show_plain_time(void);
 
 public:
+  /*
+   * Constructor
+   *
+   * Parameters:
+   *
+   * Name                Contents
+   * ------------------- ----------------------------------------------------
+   * duration_in_seconds Countdown length in seconds
+   * end_phase_seconds   End phase (blink display) time in seconds
+   * completed           A VoidFunction to be invoked when the countdown
+   *                     reaches 0
+   * command_queue       Queue for publishing messages to the panel service
+   * command_publisher   Publishes the command to the CAN bus if the latter
+   *                     is running.
+   */
   CountDownTimer(
       int16_t duration_in_seconds,
       int16_t end_phase_seconds,
       VoidFunction &completed,
-      PullQueueHT<DisplayCommand>& command_queue);
+      PullQueueHT<DisplayCommand>& command_queue,
+      DisplayCommandPublisher& command_publisher);
   virtual ~CountDownTimer();
 
+  /*
+   * Runs the command loop
+   */
   virtual void run(void) override;
 
+  /*
+   * Sets the length of the current or, if the action is not
+   * yet running, the next countdown. This is used to synchronize
+   * a continuously running countdown with the schedule.
+   */
   void set_remaining(uint16_t seconds_remaining) {
     this->seconds_remaining = seconds_remaining;
   }

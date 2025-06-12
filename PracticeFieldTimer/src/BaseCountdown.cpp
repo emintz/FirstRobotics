@@ -22,6 +22,7 @@
  */
 
 #include "BaseCountdown.h"
+#include "DisplayCommandPublisher.h"
 #include "NotifyFromISR.h"
 #include "TaskPriorities.h"
 #include "VacuousVoidFunction.h"
@@ -40,14 +41,16 @@ BaseCountdown::BaseCountdown(
     int16_t end_phase_seconds,
     int16_t reference_time,
     VoidFunction& on_completion,
-    PullQueueHT<DisplayCommand>& command_queue) :
+    PullQueueHT<DisplayCommand>& command_queue,
+    DisplayCommandPublisher& command_publisher) :
         duration_in_seconds(duration_in_seconds),
         state(State::CREATED) {
   timer = std::make_unique<CountDownTimer>(
       duration_in_seconds,
       end_phase_seconds,
       on_completion,
-      command_queue);
+      command_queue,
+      command_publisher);
   task = std::make_unique<TaskWithActionH>(
       "continuous",
       COUNTDOWN_TASK_PRIORITY,

@@ -24,11 +24,12 @@
 
 #include "CountDownTimer.h"
 
+#include "DisplayCommandPublisher.h"
 #include "VoidFunction.h"
 
 void CountDownTimer::publish_command(DisplayCommand& display_command) {
   command_queue.send_message(&display_command);
-
+  command_publisher(display_command);
 }
 
 void CountDownTimer::show_blink_time(void) {
@@ -41,6 +42,7 @@ void CountDownTimer::show_blink_time(void) {
   display_command.time_in_seconds = seconds_remaining;
   display_command.foreground.red = 63;
   publish_command(display_command);
+  command_publisher(display_command);
  }
 
 void CountDownTimer::show_plain_time(void) {
@@ -69,7 +71,8 @@ CountDownTimer::CountDownTimer(
     int16_t duration_in_seconds,
     int16_t end_phase_seconds,
     VoidFunction &completed,
-    PullQueueHT<DisplayCommand>& command_queue) :
+    PullQueueHT<DisplayCommand>& command_queue,
+    DisplayCommandPublisher& command_publisher) :
         duration_in_seconds(duration_in_seconds),
         completed(completed),
         command_queue(command_queue),
@@ -77,7 +80,8 @@ CountDownTimer::CountDownTimer(
         color_change_halfway_mark(
             (duration_in_seconds - end_phase_seconds) / 2),
         fast_blink_start(end_phase_seconds / 2),
-        slow_blink_start(end_phase_seconds) {
+        slow_blink_start(end_phase_seconds),
+        command_publisher(command_publisher) {
 }
 
 CountDownTimer::~CountDownTimer() {

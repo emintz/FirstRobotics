@@ -40,10 +40,35 @@ class TimeChangeHandler final : public CanPayloadHandler {
   PullQueueHT<DisplayCommand>& panel_command_queue;
 
 public:
+
+  /*
+   * Constructor
+   *
+   * Parameters:
+   *
+   * Name                Contents
+   * ------------------- ----------------------------------------------------
+   * panel_command_queue Forwards time display commands to the panel server
+   *                     for eventual, ideally prompt display
+   */
   TimeChangeHandler(
       PullQueueHT<DisplayCommand>& panel_command_queue);
   virtual ~TimeChangeHandler();
 
+  /*
+   * Receives a time change command from the CAN bus, transforms
+   * it into a semantically equivalent TimeChangePayload, the
+   * command to display the time, and enqueue the result to the
+   * panel command queue for eventual, ideally prompt display.
+   *
+   * Parameters:
+   *
+   * Name              Contents
+   * ----------------- ------------------------------------------------------
+   * bus               The CAN bus that received the payload (the incoming
+   *                   command).
+   * payload           The incoming time display command
+   */
   virtual void operator() (CanBus& bus, CanPayload& payload);
 };
 

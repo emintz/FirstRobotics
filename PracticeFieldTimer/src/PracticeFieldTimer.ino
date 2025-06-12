@@ -42,7 +42,6 @@
 #include "TaskPriorities.h"
 #include "TaskWithActionH.h"
 #include "TimeChangeHandler.h"
-#include "VacuousDisplayCommandPublisher.h"
 #include "WS2812B8x32vertical.h"
 
 #include <WiFi.h>
@@ -264,7 +263,8 @@ static void start_automatic_countdown(void) {
       auto_field_time_seconds,
       all_red_period,
       reference_time_utc_seconds,
-      command_queue);
+      command_queue,
+      to_can_bus);
 
   int16_t sync_time_seconds =
       reference_time_utc_seconds % auto_field_time_seconds;
@@ -277,27 +277,23 @@ static void start_automatic_countdown(void) {
       sync_time_seconds - rump_offset_time);
 }
 
-void setup() {
-  pinMode(BUILTIN_LED_PIN, OUTPUT);
-  digitalWrite(BUILTIN_LED_PIN, LOW);
-  pinMode(RED_LED_PIN, OUTPUT);
-  digitalWrite(RED_LED_PIN, LOW);
-  pinMode(YELLOW_LED_PIN, OUTPUT);
-  digitalWrite(YELLOW_LED_PIN, LOW);
-  pinMode(GREEN_LED_PIN, OUTPUT);
-  digitalWrite(GREEN_LED_PIN, LOW);
-  pinMode(CAN_ENABLE_NOT_PIN, INPUT_PULLUP);
-  pinMode(FOLLOW_ENABLE_NOT_PIN, INPUT_PULLUP);
-  pinMode(SQUARE_WAVE_PIN, INPUT);
+static void start_can_bus(void) {
+  Serial.println("Starting CAN bus.");
+  can_bus.begin();
+  if (CanBusInitStatus::FAILED == can_bus.init()) {
+    ErrorHalt::halt_and_catch_fire(
+        CAN_INIT_FAILED,
+        "Can bus initialization failed.");
+  }
+  if (CanBusOpStatus::SUCCEEDED !=
+        can_bus.start(incoming_time_change_handler)) {
+    ErrorHalt::halt_and_catch_fire(
+        CAN_START_FAILED,
+        "Can bus startup failed.");
+  }
+}
 
-  Serial.begin(115200);
-  Serial.println("Serial I/O initialized.");
-
-  blink_it(BUILTIN_LED_PIN);
-  blink_it(RED_LED_PIN);
-  blink_it(YELLOW_LED_PIN);
-  blink_it(GREEN_LED_PIN);
-
+static void start_timer_services(void) {
   if (!Wire.begin()) {
     ErrorHalt::halt_and_catch_fire(
         I2C_STARTUP_FAILED,
@@ -316,7 +312,7 @@ void setup() {
         "GPIO change interrupt service startup failed.");
   }
 
-  Serial.println("Services started.");
+  Serial.println("Timer services started.");
 
   int seconds_since_midnight = ds3231.seconds_since_midnight();
   int hours = seconds_since_midnight / 3600;
@@ -328,6 +324,32 @@ void setup() {
       hours,
       minutes,
       seconds);
+}
+
+void setup() {
+  pinMode(BUILTIN_LED_PIN, OUTPUT);
+  digitalWrite(BUILTIN_LED_PIN, LOW);
+  pinMode(RED_LED_PIN, OUTPUT);
+  digitalWrite(RED_LED_PIN, LOW);
+  pinMode(YELLOW_LED_PIN, OUTPUT);
+  digitalWrite(YELLOW_LED_PIN, LOW);
+  pinMode(GREEN_LED_PIN, OUTPUT);
+  digitalWrite(GREEN_LED_PIN, LOW);
+  pinMode(CAN_ENABLE_NOT_PIN, INPUT_PULLUP);
+  pinMode(FOLLOWER_NOT_PIN, INPUT_PULLUP);
+  pinMode(SQUARE_WAVE_PIN, INPUT);
+
+  Serial.begin(115200);
+  Serial.println("Serial I/O initialized.");
+
+  blink_it(BUILTIN_LED_PIN);
+  blink_it(RED_LED_PIN);
+  blink_it(YELLOW_LED_PIN);
+  blink_it(GREEN_LED_PIN);
+
+  if (digitalRead(FOLLOWER_NOT_PIN) == HIGH) {
+    start_timer_services();
+  }
 
   configure_if_requested();
 
@@ -348,9 +370,15 @@ void setup() {
   display_test_pattern.command = DisplayCommand::Pattern::TEST_PATTERN;
   command_queue.send_message(&display_test_pattern);
 
+  if (digitalRead(CAN_ENABLE_NOT_PIN) == LOW) {
+    start_can_bus();
+  }
+
   vTaskDelay(pdMS_TO_TICKS(10000));
 
-  start_automatic_countdown();
+  if (digitalRead(FOLLOWER_NOT_PIN) == HIGH) {
+    start_automatic_countdown();
+  }
 
   Serial.println("Setup complete.");
 }

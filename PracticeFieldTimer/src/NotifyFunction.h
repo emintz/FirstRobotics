@@ -32,13 +32,25 @@
 
 class BaseTaskWithAction;
 
-class NotifyFunction : public VoidFunction {
+class NotifyFunction final : public VoidFunction {
   BaseTaskWithAction *task;
 public:
+  /*
+   * Creates an instance that notifies the specified task.
+   *
+   * Parameters:
+   *
+   * Name              Contents
+   * ----------------- ------------------------------------------------------
+   * task              Task to be notified when apply() is invoked.
+   */
   NotifyFunction(
       BaseTaskWithAction *task);
   virtual ~NotifyFunction();
 
+  /*
+   * Notifies the task that was bound during construction.
+   */
   virtual void apply(void) override;
 };
 

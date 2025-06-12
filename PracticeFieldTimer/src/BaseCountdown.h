@@ -36,6 +36,7 @@
 #include "TaskWithActionH.h"
 #include "VoidFunction.h"
 
+class DisplayCommandPublisher;
 class TimeSource;
 
 #include <memory>
@@ -94,6 +95,8 @@ protected:
    *                      sessions starting at 0900.
    * on_completion        VoidFunction to invoke when a count down reaches 0
    * command_queue        Carries display commands to the panel server.
+   * command_publisher    Publishes the command to the CAN bus if the
+   *                      latter is running.
    *
    */
   BaseCountdown(
@@ -102,7 +105,8 @@ protected:
       int16_t end_phase_seconds,
       int16_t reference_time,
       VoidFunction& on_completion,
-      PullQueueHT<DisplayCommand>& command_queue);
+      PullQueueHT<DisplayCommand>& command_queue,
+      DisplayCommandPublisher& command_pubisher);
 public:
   virtual ~BaseCountdown();
 

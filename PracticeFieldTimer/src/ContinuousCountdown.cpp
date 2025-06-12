@@ -34,14 +34,16 @@ ContinuousCountdown::ContinuousCountdown(
     int16_t duration_in_seconds,
     int16_t end_phase_seconds,
     int16_t reference_time,
-    PullQueueHT<DisplayCommand>& command_queue) :
+    PullQueueHT<DisplayCommand>& command_queue,
+    DisplayCommandPublisher& command_publisher) :
       BaseCountdown(
           sqw_pin,
           duration_in_seconds,
           end_phase_seconds,
           reference_time,
           do_nothing,
-          command_queue) {
+          command_queue,
+          command_publisher) {
 }
 
 ContinuousCountdown::~ContinuousCountdown() {

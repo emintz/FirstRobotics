@@ -30,6 +30,8 @@
 
 #include "BaseCountdown.h"
 
+class DisplayCommandPublisher;
+
 class ContinuousCountdown : public BaseCountdown {
 public:
   /*
@@ -53,14 +55,16 @@ public:
    *                      This is useful for running, say, 12 minute
    *                      sessions starting at 0900.
    * command_queue        Carries display commands to the panel server.
-   *
+   * command_publisher    Publishes the command to the CAN bus if the
+   *                      latter is running.
    */
   ContinuousCountdown(
       uint8_t sqw_pin,
       int16_t duration_in_seconds,
       int16_t end_phase_seconds,
       int16_t reference_time,
-      PullQueueHT<DisplayCommand>& command_queue);
+      PullQueueHT<DisplayCommand>& command_queue,
+      DisplayCommandPublisher& command_publisher);
   virtual ~ContinuousCountdown();
 };
 

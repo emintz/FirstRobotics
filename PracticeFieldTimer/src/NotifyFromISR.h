@@ -6,8 +6,7 @@
  *
  * A void function that notifies a task that is determined
  * at construction. This function MUST be used from an
- * interrupt service routine. DO NOT use this in
- * application code.
+ * interrupt service routine. DO NOT use this in application code.
  *
  * Copyright (C) 2025 Eric Mintz
  * All Rights Reserved
@@ -36,9 +35,21 @@ class BaseTaskWithAction;
 class NotifyFromISR : public VoidFunction {
   BaseTaskWithAction *task;
 public:
+  /*
+   * Creates an instance that notifies the specified task.
+   *
+   * Parameters:
+   *
+   * Name              Contents
+   * ----------------- ------------------------------------------------------
+   * task              Task to be notified when apply() is invoked.
+   */
   NotifyFromISR(BaseTaskWithAction *task);
   virtual ~NotifyFromISR();
 
+  /*
+   * Notifies the task that was bound during construction.
+   */
   virtual void apply(void) override;
 };
 
