@@ -38,6 +38,12 @@ class CANDisplayCommandPublisher final :
 public:
   CANDisplayCommandPublisher(CanBus& can_bus);
 
+  /*
+   * Publishes a display command to the CAN bus and show
+   * publication status on LEDs. When publication succeeds,
+   * turn off the red LED and illuminate the green. When
+   * publication fails, do the opposite.
+   */
   virtual void operator()(const DisplayCommand& command);
 };
 

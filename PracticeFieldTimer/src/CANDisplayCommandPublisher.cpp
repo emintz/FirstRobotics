@@ -22,11 +22,13 @@
 
 #include "CANDisplayCommandPublisher.h"
 
+#include "Arduino.h"
 #include "CanBus.h"
 #include "CanBusMaps.h"
 #include "CanPayload.h"
 #include "CanEnumerations.h"
 #include "DisplayCommand.h"
+#include "PinAssignments.h"
 #include "TimeChangePayload.h"
 
 CANDisplayCommandPublisher::CANDisplayCommandPublisher(
@@ -54,4 +56,11 @@ void CANDisplayCommandPublisher::operator()(const DisplayCommand& command) {
 //      static_cast<int>(time_change.green),
 //      static_cast<int>(time_change.red),
 //      CanBusMaps::INSTANCE.to_c_string(send_status));
+  if (CanBusOpStatus::SUCCEEDED == send_status) {
+    digitalWrite(RED_LED_PIN, LOW);
+    digitalWrite(GREEN_LED_PIN, HIGH);
+  } else {
+    digitalWrite(RED_LED_PIN, HIGH);
+    digitalWrite(GREEN_LED_PIN, LOW);
+  }
 }
