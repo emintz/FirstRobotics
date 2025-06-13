@@ -291,6 +291,7 @@ static void start_can_bus(void) {
         CAN_START_FAILED,
         "Can bus startup failed.");
   }
+  Serial.println("CAN bus is running.");
 }
 
 static void start_timer_services(void) {
@@ -299,7 +300,6 @@ static void start_timer_services(void) {
         I2C_STARTUP_FAILED,
         "Two-Wire (I2C) bus initialization failed.");
   }
-
   if (!ds3231.begin()) {
     ErrorHalt::halt_and_catch_fire(
         DS3231_STARTUP_FAILED,

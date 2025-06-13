@@ -45,13 +45,13 @@ void CANDisplayCommandPublisher::operator()(const DisplayCommand& command) {
   time_display_message.set_id(static_cast<int>(command.command))
       .set_data(time_change);
   CanBusOpStatus send_status = can_bus.transmit(time_display_message, 2);
-  Serial.printf(
-      "Publishing CAN: id: %d, seconds: %d, red: %d, green: %d, blue: %d, "
-          "publication status is: %s.\n",
-      time_display_message.message_id(),
-      static_cast<int>(time_change.seconds_since_midnight),
-      static_cast<int>(time_change.red),
-      static_cast<int>(time_change.green),
-      static_cast<int>(time_change.red),
-      CanBusMaps::INSTANCE.to_c_string(send_status));
+//  Serial.printf(
+//      "Publishing CAN: id: %d, seconds: %d, red: %d, green: %d, blue: %d, "
+//          "publication status is: %s.\n",
+//      time_display_message.message_id(),
+//      static_cast<int>(time_change.seconds_since_midnight),
+//      static_cast<int>(time_change.red),
+//      static_cast<int>(time_change.green),
+//      static_cast<int>(time_change.red),
+//      CanBusMaps::INSTANCE.to_c_string(send_status));
 }
