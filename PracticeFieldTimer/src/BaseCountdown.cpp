@@ -25,7 +25,19 @@
 #include "DisplayCommandPublisher.h"
 #include "NotifyFromISR.h"
 #include "TaskPriorities.h"
-#include "VacuousVoidFunction.h"
+
+class OnCompletion final : public VoidFunction {
+  BaseCountdown& countdown;
+
+public:
+  inline OnCompletion(BaseCountdown *countdown) :
+  countdown(*countdown) {
+  }
+
+  virtual void apply(void) override {
+    countdown.on_countdown_complete();
+  }
+};
 
 void BaseCountdown::maybe_set_initial_duration(int16_t initial_duration_seconds)  {
   if (0 < initial_duration_seconds) {
@@ -40,15 +52,15 @@ BaseCountdown::BaseCountdown(
     int16_t duration_in_seconds,
     int16_t end_phase_seconds,
     int16_t reference_time,
-    VoidFunction& on_completion,
     PullQueueHT<DisplayCommand>& command_queue,
     DisplayCommandPublisher& command_publisher) :
         duration_in_seconds(duration_in_seconds),
         state(State::CREATED) {
+  on_completion = std::make_unique<OnCompletion>(this);
   timer = std::make_unique<CountDownTimer>(
       duration_in_seconds,
       end_phase_seconds,
-      on_completion,
+      *(on_completion.get()),
       command_queue,
       command_publisher);
   task = std::make_unique<TaskWithActionH>(

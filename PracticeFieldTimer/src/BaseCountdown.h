@@ -36,6 +36,8 @@
 #include "TaskWithActionH.h"
 #include "VoidFunction.h"
 
+#include <atomic>
+
 class DisplayCommandPublisher;
 class TimeSource;
 
@@ -48,8 +50,9 @@ class BaseCountdown {
     PAUSED,
   };
 
-  State state;
+  std::atomic<State> state;
   const int16_t duration_in_seconds;
+  std::unique_ptr<VoidFunction> on_completion;
   std::unique_ptr<VoidFunction> notify_function;
   std::unique_ptr<CountDownTimer> timer;
   std::unique_ptr<GpioChangeDetector> sqw_detector;
@@ -73,6 +76,7 @@ class BaseCountdown {
   void maybe_set_initial_duration(int16_t initial_duration_seconds);
 
 protected:
+
   /*
    * Constructs a newly initialized instance.
    *
@@ -93,7 +97,6 @@ protected:
    *                      to synchronize session start with clock time.
    *                      This is useful for running, say, 12 minute
    *                      sessions starting at 0900.
-   * on_completion        VoidFunction to invoke when a count down reaches 0
    * command_queue        Carries display commands to the panel server.
    * command_publisher    Publishes the command to the CAN bus if the
    *                      latter is running.
@@ -104,7 +107,6 @@ protected:
       int16_t duration_in_seconds,
       int16_t end_phase_seconds,
       int16_t reference_time,
-      VoidFunction& on_completion,
       PullQueueHT<DisplayCommand>& command_queue,
       DisplayCommandPublisher& command_pubisher);
 public:
@@ -118,17 +120,22 @@ public:
    * Parameters:
    * ----------
    *
-   * Name                   Contents
-   * -----------------      ------------------------------------------------
-   * seconds_since_midnight Current time (UTC) in seconds since 0000.
-   *                        One shot timers ignore this value.
+   * Name                     Contents
+   * -----------------        ------------------------------------------------
+   * initial_duration_seconds Number of seconds to count down in the first
+   *                          iteration. Ignored if 0.
    */
-  void enable(int seconds_since_midnight = 0);
+  void enable(int initial_duration_seconds = 0);
 
   /*
    * Disable (i.e.) stop the counter
    */
   void disable(void);
+
+  /*
+   * Invoked when a countdown cycle completes.
+   */
+  virtual void on_countdown_complete(void) = 0;
 };
 
 #endif /* BASECOUNTDOWN_H_ */

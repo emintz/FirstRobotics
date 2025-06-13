@@ -25,9 +25,8 @@
 
 #include "ContinuousCountdown.h"
 
-#include "VacuousVoidFunction.h"
-
-static VacuousVoidFunction do_nothing;
+void ContinuousCountdown::on_countdown_complete(void) {
+}
 
 ContinuousCountdown::ContinuousCountdown(
     uint8_t sqw_pin,
@@ -41,7 +40,6 @@ ContinuousCountdown::ContinuousCountdown(
           duration_in_seconds,
           end_phase_seconds,
           reference_time,
-          do_nothing,
           command_queue,
           command_publisher) {
 }

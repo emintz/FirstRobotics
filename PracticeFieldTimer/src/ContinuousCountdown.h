@@ -33,6 +33,9 @@
 class DisplayCommandPublisher;
 
 class ContinuousCountdown : public BaseCountdown {
+
+  virtual void on_countdown_complete(void) override;
+
 public:
   /*
    * Constructs a newly initialized instance.
