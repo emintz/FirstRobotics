@@ -43,8 +43,6 @@ void BaseCountdown::maybe_set_initial_duration(int16_t initial_duration_seconds)
   if (0 < initial_duration_seconds) {
     timer->set_remaining(initial_duration_seconds);
   }
-
-  Serial.printf("Initial duration: %d.\n", (int) initial_duration_seconds);
 }
 
 BaseCountdown::BaseCountdown(
@@ -73,6 +71,7 @@ BaseCountdown::BaseCountdown(
       sqw_pin,
       GpioChangeType::HIGH_TO_LOW,
       notify_function.get());
+  Serial.println("Countdown created.");
 }
 
 BaseCountdown::~BaseCountdown() {
@@ -111,5 +110,19 @@ void BaseCountdown::disable(void) {
     sqw_detector->stop();
     state = State::PAUSED;
     break;
+  }
+}
+
+CountdownEnableAction::CountdownEnableAction(BaseCountdown& to_enable) :
+    to_enable(to_enable) {
+}
+
+CountdownEnableAction::~CountdownEnableAction() {
+}
+
+void CountdownEnableAction::run(void) {
+  while (true) {
+    wait_for_notification();
+    to_enable.enable();
   }
 }

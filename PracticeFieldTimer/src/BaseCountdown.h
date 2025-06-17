@@ -138,4 +138,28 @@ public:
   virtual void on_countdown_complete(void) = 0;
 };
 
+/*
+ * Task action that enables a countdown when it is
+ * notified. The countdown is specified at construction.
+ */
+class CountdownEnableAction final : public TaskAction {
+
+  BaseCountdown& to_enable;
+public:
+
+  /*
+   * Constructor
+   *
+   * Name              Contents
+   * ----------------- ------------------------------------------------
+   * to_enable         Countdown to be enabled upon notification
+   *                   receipt.
+   */
+  CountdownEnableAction(BaseCountdown& to_enable);
+
+  virtual ~CountdownEnableAction();
+
+  virtual void run(void) override;
+};
+
 #endif /* BASECOUNTDOWN_H_ */

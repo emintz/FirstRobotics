@@ -35,6 +35,7 @@
 #include "DS3231TimeSource.h"
 #include "ErrorHalt.h"
 #include "Flash32.h"
+#include "ManualCountdown.h"
 #include "PanelServer.h"
 #include "PinAssignments.h"
 #include "PressAndHold.h"
@@ -86,6 +87,7 @@ static TaskWithActionH server_task(
     4096);
 
 static std::unique_ptr<ContinuousCountdown> continuous_count_down;
+static std::unique_ptr<ManualCountdown> manual_count_down;
 
 static TimeChangeHandler incoming_time_change_handler(command_queue);
 static CanBus can_bus(CAN_RECEIVE_PIN, CAN_TRANSMIT_PIN, CanBusSpeed::BPS_100K);
@@ -248,12 +250,9 @@ static void load_configuration(void) {
 }
 
 /*
- * Start the continuously running automatic countdown. This method
- * should be invoked if and only if the automatic countdown is
- * configured to run.
- *
- * TODO: write a corresponding method to enable manually-started
- *       countdown.
+ * Create and start the continuously running automatic countdown.
+ * This method should be invoked if and only if the automatic countdown
+ * is configured to run.
  */
 static void start_automatic_countdown(void) {
   int16_t auto_field_time_seconds = 60 * auto_field_time_minutes;
@@ -275,6 +274,32 @@ static void start_automatic_countdown(void) {
   }
   continuous_count_down->enable(
       sync_time_seconds - rump_offset_time);
+}
+
+/*
+ * Create and start the manually started countdown. This method
+ * should be invoked if and only if manual countdown is configured
+ * to run.
+ */
+void start_manual_countdown(void) {
+  int16_t manual_field_time_seconds = 60 * manual_field_time_minutes;
+  Serial.println("Starting GPIO Change Service.");
+  vTaskDelay(pdMS_TO_TICKS(100));
+  GpioChangeService.begin();
+  Serial.println("Creating manual countdown.");
+  vTaskDelay(pdMS_TO_TICKS(100));
+  manual_count_down = std::make_unique<ManualCountdown>(
+      SET_CONFIGURATION_PIN,
+      SQUARE_WAVE_PIN,
+      manual_field_time_seconds,
+      60,
+      command_queue,
+      to_can_bus);
+  Serial.println("Starting manual countdown.");
+  vTaskDelay(pdMS_TO_TICKS(100));
+  manual_count_down->start();
+  Serial.println("Manual countdown configured.");
+  vTaskDelay(pdMS_TO_TICKS(100));
 }
 
 static void start_can_bus(void) {
@@ -377,7 +402,13 @@ void setup() {
   vTaskDelay(pdMS_TO_TICKS(10000));
 
   if (digitalRead(FOLLOWER_NOT_PIN) == HIGH) {
+    Serial.println("Starting the automatic, continuously running countdown.");
     start_automatic_countdown();
+  } else {
+    Serial.println("Requesting manual countdown startup.");
+    start_manual_countdown();
+    Serial.println("Returned from manual countdown startup.");
+    vTaskDelay(pdMS_TO_TICKS(100));
   }
 
   Serial.println("Setup complete.");
