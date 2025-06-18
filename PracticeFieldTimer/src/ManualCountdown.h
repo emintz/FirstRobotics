@@ -38,6 +38,8 @@
 
 class ManualCountdown final {
 
+  PullQueueHT<DisplayCommand>& command_queue;
+  DisplayCommandPublisher& command_publisher;
   OneShotCountdown actual_countdown;
   CountdownEnableAction countdown_enable;
   NotifyTaskOnPinChange on_pin_change;
@@ -52,12 +54,14 @@ public:
       DisplayCommandPublisher& command_publisher);
   virtual ~ManualCountdown();
 
-  inline bool start(void) {
-    return on_pin_change.start();
-  }
-
   inline void run_one_time(void) {
     actual_countdown.enable();
+  }
+
+  void send(const DisplayCommand& command);
+
+  inline bool start(void) {
+    return on_pin_change.start();
   }
 };
 

@@ -23,8 +23,8 @@
 
 #include "ManualCountdown.h"
 
+#include "DisplayCommandPublisher.h"
 #include "TaskAction.h"
-
 
 ManualCountdown::ManualCountdown(
     uint8_t start_pin,
@@ -33,6 +33,8 @@ ManualCountdown::ManualCountdown(
     int16_t end_phase_seconds,
     PullQueueHT<DisplayCommand>& command_queue,
     DisplayCommandPublisher& command_publisher) :
+        command_queue(command_queue),
+        command_publisher(command_publisher),
         actual_countdown(
             sqw_pin,
             duration_in_seconds,
@@ -51,3 +53,7 @@ ManualCountdown::ManualCountdown(
 ManualCountdown::~ManualCountdown() {
 }
 
+void ManualCountdown::send(const DisplayCommand& command) {
+  command_queue.send_message(&command);
+  command_publisher(command);
+}

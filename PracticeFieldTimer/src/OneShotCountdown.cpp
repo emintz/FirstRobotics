@@ -22,6 +22,8 @@
  */
 
 #include "OneShotCountdown.h"
+#include "DisplayCommand.h"
+#include "DisplayCommandPublisher.h"
 
 OneShotCountdown::OneShotCountdown(
     uint8_t sqw_pin,
@@ -35,7 +37,9 @@ OneShotCountdown::OneShotCountdown(
             end_phase_seconds,
             0,
             command_queue,
-            command_publisher) {
+            command_publisher),
+        command_queue(command_queue),
+        command_publisher(command_publisher) {
 }
 
 OneShotCountdown::~OneShotCountdown() {
@@ -43,4 +47,10 @@ OneShotCountdown::~OneShotCountdown() {
 
 void OneShotCountdown::on_countdown_complete(void) {
   disable();
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  DisplayCommand command;
+  memset(&command, 0, sizeof(command));
+  command.command = DisplayCommand::Pattern::FLOOD;
+  command_queue.send_message(&command);
+  command_publisher(command);
 }

@@ -283,11 +283,11 @@ static void start_automatic_countdown(void) {
  */
 void start_manual_countdown(void) {
   int16_t manual_field_time_seconds = 60 * manual_field_time_minutes;
-  Serial.println("Starting GPIO Change Service.");
-  vTaskDelay(pdMS_TO_TICKS(100));
+//  Serial.println("Starting GPIO Change Service.");
+//  vTaskDelay(pdMS_TO_TICKS(100));
   GpioChangeService.begin();
-  Serial.println("Creating manual countdown.");
-  vTaskDelay(pdMS_TO_TICKS(100));
+//  Serial.println("Creating manual countdown.");
+//  vTaskDelay(pdMS_TO_TICKS(100));
   manual_count_down = std::make_unique<ManualCountdown>(
       SET_CONFIGURATION_PIN,
       SQUARE_WAVE_PIN,
@@ -295,11 +295,27 @@ void start_manual_countdown(void) {
       60,
       command_queue,
       to_can_bus);
-  Serial.println("Starting manual countdown.");
-  vTaskDelay(pdMS_TO_TICKS(100));
+//  Serial.println("Starting manual countdown.");
+//  vTaskDelay(pdMS_TO_TICKS(100));
   manual_count_down->start();
-  Serial.println("Manual countdown configured.");
-  vTaskDelay(pdMS_TO_TICKS(100));
+//  Serial.println("Manual countdown configured.");
+//  vTaskDelay(pdMS_TO_TICKS(100));
+  DisplayCommand command;
+  memset(&command, 0, sizeof(command));
+  command.command = DisplayCommand::Pattern::FLOOD;
+  manual_count_down->send(command);
+}
+
+static void start_countdown(void) {
+  if (digitalRead(MANUAL_ENABLE_NOT_PIN) == HIGH) {
+    Serial.println("Starting the automatic, continuously running countdown.");
+    start_automatic_countdown();
+  } else {
+    Serial.println("Requesting manual countdown startup.");
+    start_manual_countdown();
+    Serial.println("Returned from manual countdown startup.");
+    vTaskDelay(pdMS_TO_TICKS(100));
+  }
 }
 
 static void start_can_bus(void) {
@@ -362,6 +378,7 @@ void setup() {
   digitalWrite(GREEN_LED_PIN, LOW);
   pinMode(CAN_ENABLE_NOT_PIN, INPUT_PULLUP);
   pinMode(FOLLOWER_NOT_PIN, INPUT_PULLUP);
+  pinMode(MANUAL_ENABLE_NOT_PIN, INPUT_PULLUP);
   pinMode(SQUARE_WAVE_PIN, INPUT);
 
   Serial.begin(115200);
@@ -402,14 +419,21 @@ void setup() {
   vTaskDelay(pdMS_TO_TICKS(10000));
 
   if (digitalRead(FOLLOWER_NOT_PIN) == HIGH) {
-    Serial.println("Starting the automatic, continuously running countdown.");
-    start_automatic_countdown();
+    Serial.println("Configured as leader, starting countdown.");
+    start_countdown();
   } else {
-    Serial.println("Requesting manual countdown startup.");
-    start_manual_countdown();
-    Serial.println("Returned from manual countdown startup.");
-    vTaskDelay(pdMS_TO_TICKS(100));
+    Serial.println("Configured as follower, bypassing countdown start.");
   }
+
+//  if (digitalRead(MANUAL_ENABLE_NOT_PIN) == HIGH) {
+//    Serial.println("Starting the automatic, continuously running countdown.");
+//    start_automatic_countdown();
+//  } else {
+//    Serial.println("Requesting manual countdown startup.");
+//    start_manual_countdown();
+//    Serial.println("Returned from manual countdown startup.");
+//    vTaskDelay(pdMS_TO_TICKS(100));
+//  }
 
   Serial.println("Setup complete.");
 }

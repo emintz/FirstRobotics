@@ -1,12 +1,11 @@
 /*
- * Command.h
+ * FloodPanel.h
  *
- *  Created on: May 15, 2025
+ *  Created on: Jun 18, 2025
  *      Author: Eric Mintz
  *
- * Holds a command that directs the display manager to paint
- * a specified set of information on the display panel. Note
- * that this only loosely related to CAN messages.
+ * Display driver that floods the panel with a specified color.
+ * The color is specified in the incoming command.
  *
  * Copyright (C) 2025 Eric Mintz
  * All Rights Reserved
@@ -25,29 +24,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef DISPLAY_COMMAND_H_
-#define DISPLAY_COMMAND_H_
+#ifndef SRC_FLOODPANEL_H_
+#define SRC_FLOODPANEL_H_
 
-#include "Arduino.h"
+#include "DisplayDriver.h"
 
-struct DisplayCommand {
-  enum class Pattern {
-    TEST_PATTERN = 1,
-    PLAIN_TIME = 2,
-    SLOW_BLINK_TIME = 3,
-    FAST_BLINK_TIME = 4,
-    FLOOD = 5,
-  };
+#include "CanBus.h"
+#include "CanPayload.h"
 
-  struct Color {
-    uint8_t red;
-    uint8_t green;
-    uint8_t blue;
-  };
+class LedPanel;
 
-  Pattern command;
-  Color foreground;
-  int16_t time_in_seconds;
+class FloodPanel final : public DisplayDriver {
+
+public:
+  FloodPanel();
+
+  virtual ~FloodPanel();
+  virtual void operator() (
+      PullQueueHT<DisplayCommand> &command_queue,
+      const DisplayCommand &command,
+      LedPanel &panel) override;
 };
 
-#endif /* DISPLAY_COMMAND_H_ */
+#endif /* SRC_FLOODPANEL_H_ */

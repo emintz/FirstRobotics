@@ -25,10 +25,13 @@
 
 #include "BlinkErrorCodes.h"
 #include "ErrorHalt.h"
+#include "FloodPanel.h"
 #include "FastBlinkTime.h"
 #include "PlainTime.h"
 #include "SlowBlinkTime.h"
 #include "TestPattern.h"
+
+#include <memory>
 
 DisplayDrivers::DisplayDrivers() :
     driver_map() {
@@ -36,6 +39,7 @@ DisplayDrivers::DisplayDrivers() :
   driver_map[DisplayCommand::Pattern::PLAIN_TIME] = std::make_shared<PlainTime>();
   driver_map[DisplayCommand::Pattern::SLOW_BLINK_TIME] = std::make_shared<SlowBlinkTime>();
   driver_map[DisplayCommand::Pattern::FAST_BLINK_TIME] = std::make_shared<FastBlinkTime>();
+  driver_map[DisplayCommand::Pattern::FLOOD] = std::make_shared<FloodPanel>();
 }
 
 DisplayDrivers::~DisplayDrivers() {

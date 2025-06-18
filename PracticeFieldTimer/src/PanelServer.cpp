@@ -27,7 +27,6 @@
 #include "DisplayDriver.h"
 #include "DisplayDrivers.h"
 #include "LedPanel.h"
-#include "VacuousDisplayCommandPublisher.h"
 
 #include <memory>
 
@@ -49,8 +48,10 @@ void PanelServer::run(void) {
     do {
        got_one = queue.pull_message(&display_command);
     } while (!got_one);
-    DisplayCommand::Pattern pattern = static_cast<DisplayCommand::Pattern>( display_command.command);
-    std::shared_ptr<DisplayDriver> driver_ptr = DisplayDrivers::drivers[pattern];
+    DisplayCommand::Pattern pattern =
+        static_cast<DisplayCommand::Pattern>( display_command.command);
+    std::shared_ptr<DisplayDriver> driver_ptr =
+        DisplayDrivers::drivers[pattern];
     if (driver_ptr) {
       (*driver_ptr)(queue, display_command, panel);
     } else {

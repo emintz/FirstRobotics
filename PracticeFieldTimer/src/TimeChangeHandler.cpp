@@ -25,6 +25,7 @@
 
 #include "CanBus.h"
 #include "CanPayload.h"
+#include "PinAssignments.h"
 #include "TimeChangePayload.h"
 
 TimeChangeHandler::TimeChangeHandler(
@@ -49,5 +50,7 @@ void TimeChangeHandler::operator()(
   send_to_panel.foreground.red = time_change_payload.red;
   send_to_panel.foreground.green = time_change_payload.green;
   send_to_panel.foreground.blue = time_change_payload.blue;
-  panel_command_queue.send_message(&send_to_panel);
+  if (!panel_command_queue.send_message(&send_to_panel)) {
+    digitalWrite(RED_LED_PIN, HIGH);
+  }
 }

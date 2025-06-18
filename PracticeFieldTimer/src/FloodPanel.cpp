@@ -1,12 +1,8 @@
 /*
- * Command.h
+ * FloodPanel.cpp
  *
- *  Created on: May 15, 2025
+ *  Created on: Jun 18, 2025
  *      Author: Eric Mintz
- *
- * Holds a command that directs the display manager to paint
- * a specified set of information on the display panel. Note
- * that this only loosely related to CAN messages.
  *
  * Copyright (C) 2025 Eric Mintz
  * All Rights Reserved
@@ -25,29 +21,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef DISPLAY_COMMAND_H_
-#define DISPLAY_COMMAND_H_
+#include "FloodPanel.h"
 
-#include "Arduino.h"
+#include "LedPanel.h"
 
-struct DisplayCommand {
-  enum class Pattern {
-    TEST_PATTERN = 1,
-    PLAIN_TIME = 2,
-    SLOW_BLINK_TIME = 3,
-    FAST_BLINK_TIME = 4,
-    FLOOD = 5,
-  };
+FloodPanel::FloodPanel() {
+}
 
-  struct Color {
-    uint8_t red;
-    uint8_t green;
-    uint8_t blue;
-  };
+FloodPanel::~FloodPanel() {
+}
 
-  Pattern command;
-  Color foreground;
-  int16_t time_in_seconds;
-};
-
-#endif /* DISPLAY_COMMAND_H_ */
+void FloodPanel::operator()(
+    PullQueueHT<DisplayCommand> &command_queue,
+    const DisplayCommand &command,
+    LedPanel &panel) {
+  panel.flood(
+      command.foreground.red,
+      command.foreground.green,
+      command.foreground.blue);
+  panel.update();
+}

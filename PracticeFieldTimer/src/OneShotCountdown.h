@@ -34,6 +34,8 @@
 class DisplayCommandPublisher;
 
 class OneShotCountdown final : public BaseCountdown {
+  PullQueueHT<DisplayCommand>& command_queue;
+  DisplayCommandPublisher& command_publisher;
 public:
   OneShotCountdown(
       uint8_t sqw_pin,
