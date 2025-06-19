@@ -283,11 +283,7 @@ static void start_automatic_countdown(void) {
  */
 void start_manual_countdown(void) {
   int16_t manual_field_time_seconds = 60 * manual_field_time_minutes;
-//  Serial.println("Starting GPIO Change Service.");
-//  vTaskDelay(pdMS_TO_TICKS(100));
   GpioChangeService.begin();
-//  Serial.println("Creating manual countdown.");
-//  vTaskDelay(pdMS_TO_TICKS(100));
   manual_count_down = std::make_unique<ManualCountdown>(
       SET_CONFIGURATION_PIN,
       SQUARE_WAVE_PIN,
@@ -403,14 +399,17 @@ void setup() {
   server_task.start();
   Serial.println("Panel server task started.");
 
+  if (digitalRead(CAN_ENABLE_NOT_PIN) == LOW) {
+    start_can_bus();
+  }
+
   DisplayCommand display_test_pattern;
   memset(&display_test_pattern, 0, sizeof(display_test_pattern));
   display_test_pattern.command = DisplayCommand::Pattern::TEST_PATTERN;
   command_queue.send_message(&display_test_pattern);
+  Serial.println("Displaying test pattern.");
+  vTaskDelay(pdMS_TO_TICKS(10000));
 
-  if (digitalRead(CAN_ENABLE_NOT_PIN) == LOW) {
-    start_can_bus();
-  }
 
   if (digitalRead(FOLLOWER_NOT_PIN) == HIGH) {
     Serial.println("Configured as leader, starting countdown.");
