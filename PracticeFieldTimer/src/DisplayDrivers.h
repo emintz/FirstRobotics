@@ -35,13 +35,27 @@
 
 class DisplayDrivers {
   std::map<DisplayCommand::Pattern, std::shared_ptr<DisplayDriver>> driver_map;
+
   DisplayDrivers();
 public:
   virtual ~DisplayDrivers();
 
   static DisplayDrivers drivers;
 
-  std::shared_ptr<DisplayDriver> operator[](const DisplayCommand::Pattern pattern);
+  /*
+   * Returns a pointer to the display driver that displays the
+   * specified pattern.
+   *
+   * Parameters:
+   * ----------
+   *
+   * Name                 Contents
+   * -----------------    ------------------------------------------------
+   * pattern              Display pattern (e.g. steady, unblinking remaining
+   *                      time in the specified color)
+   */
+  std::shared_ptr<DisplayDriver> operator[](
+      const DisplayCommand::Pattern pattern);
 };
 
 #endif /* DISPLAYDRIVERS_H_ */

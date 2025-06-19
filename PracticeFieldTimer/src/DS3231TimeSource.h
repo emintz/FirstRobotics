@@ -56,6 +56,9 @@ public:
    */
   virtual bool begin(void) override;
 
+  /*
+   * Provides the current time as seconds since midnight UTC.
+   */
   virtual int seconds_since_midnight(void) override;
 };
 

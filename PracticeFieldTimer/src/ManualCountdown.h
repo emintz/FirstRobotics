@@ -5,8 +5,9 @@
  *      Author: Eric Mintz
  *
  * A manual countdown that runs once when a specified GPIO goes
- * low. It's meant to be started manually via a mechanical switch,
- * so the start signal is debounced.
+ * low. It's meant to be started manually via a mechanical switch.
+ * The start signal should be debounced, but isn't at the moment.
+ * TODO(emintz): debounce the start signal.
  *
  * Copyright (C) 2025 Eric Mintz
  * All Rights Reserved
@@ -45,6 +46,26 @@ class ManualCountdown final {
   NotifyTaskOnPinChange on_pin_change;
 
 public:
+  /*
+   * Constructor
+   *
+   * Parameters:
+   * ----------
+   *
+   * Name                 Contents
+   * -----------------    ------------------------------------------------
+   * start_pin            Countdown start switch, normally HIGH. Countdown
+   *                      starts when the pin goes LOW.
+   * sqw_pin              Input pin for 1 Hz square wave from the time
+   *                      source.
+   * duration_seconds     Countdown duration in seconds, e.g. 900 for
+   *                      a 15 minute countdown.
+   * command_queue        Queue for sending a command to the panel
+   *                      service
+   * command_publisher    Publishes display events to the CAN bus if
+   *                      the latter is enabled. Does nothing if the
+   *                      bus is disabled.
+   */
   ManualCountdown(
       uint8_t start_pin,
       uint8_t sqw_pin,
@@ -54,10 +75,25 @@ public:
       DisplayCommandPublisher& command_publisher);
   virtual ~ManualCountdown();
 
+  /*
+   * Convenience method that runs the countdown one
+   * time. Used for testing.
+   */
   inline void run_one_time(void) {
     actual_countdown.enable();
   }
 
+  /*
+   * Sends a display command to the panel server and publishes
+   * it to the CAN bus, if enabled.
+    *
+   * Parameters:
+   * ----------
+   *
+   * Name                 Contents
+   * -----------------    ------------------------------------------------
+   * command              Command to run and publish.
+   */
   void send(const DisplayCommand& command);
 
   inline bool start(void) {

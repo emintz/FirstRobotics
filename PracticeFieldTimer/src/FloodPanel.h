@@ -40,6 +40,22 @@ public:
   FloodPanel();
 
   virtual ~FloodPanel();
+
+  /*
+   * Floods the display panel with the color specified in an incoming
+   * display command.
+   *
+   * Parameters:
+   * ----------
+   *
+   * Name                 Contents
+   * -----------------    ------------------------------------------------
+   *  command_queue       The pull queue that provides the commands. This
+   *                      is used to generate time delays that expire when
+   *                      a message arrives (via PullQueueHT::peek()).
+   * command              What to display
+   * panel                The display panel, the display command's target.
+   */
   virtual void operator() (
       PullQueueHT<DisplayCommand> &command_queue,
       const DisplayCommand &command,

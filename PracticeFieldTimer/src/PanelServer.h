@@ -38,11 +38,25 @@ class PanelServer : public TaskAction {
   PullQueueHT<DisplayCommand> &queue;
   LedPanel &panel;
 public:
+  /*
+   * Constructor
+   *
+   * Parameters:
+   * ----------
+   *
+   * Name                 Contents
+   * -----------------    ------------------------------------------------
+   * queue                Pull queue that provides display commands
+   * panel                Target LED panel -- display here as commanded.
+   */
   PanelServer(
       PullQueueHT<DisplayCommand> &queue,
       LedPanel &panel);
   virtual ~PanelServer();
 
+  /*
+   * Service logic.
+   */
   virtual void run(void);
 };
 

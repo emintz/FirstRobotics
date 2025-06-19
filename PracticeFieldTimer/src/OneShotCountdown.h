@@ -34,9 +34,27 @@
 class DisplayCommandPublisher;
 
 class OneShotCountdown final : public BaseCountdown {
+
   PullQueueHT<DisplayCommand>& command_queue;
   DisplayCommandPublisher& command_publisher;
 public:
+  /*
+   * Constructor
+   *
+   * Parameters:
+   * ----------
+   *
+   * Name                 Contents
+   * -----------------    ------------------------------------------------
+   * sqw_pin              Time source, provides a 1 Hz square wave
+   * duration_in_seconds  Length of the countdown in seconds, e.g.
+   *                      900 for 15 minutes
+   * end_phase_seconds    The length of the end phase, the last bit
+   *                      of the countdown where the time display
+   *                      blinks annoyingly.
+   * command_queue        Carries display commands to the panel server.
+   * command_publisher    Publishes the command to the CAN bus if the
+   */
   OneShotCountdown(
       uint8_t sqw_pin,
       int16_t duration_in_seconds,

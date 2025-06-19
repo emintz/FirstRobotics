@@ -295,11 +295,7 @@ void start_manual_countdown(void) {
       60,
       command_queue,
       to_can_bus);
-//  Serial.println("Starting manual countdown.");
-//  vTaskDelay(pdMS_TO_TICKS(100));
   manual_count_down->start();
-//  Serial.println("Manual countdown configured.");
-//  vTaskDelay(pdMS_TO_TICKS(100));
   DisplayCommand command;
   memset(&command, 0, sizeof(command));
   command.command = DisplayCommand::Pattern::FLOOD;
@@ -416,24 +412,12 @@ void setup() {
     start_can_bus();
   }
 
-  vTaskDelay(pdMS_TO_TICKS(10000));
-
   if (digitalRead(FOLLOWER_NOT_PIN) == HIGH) {
     Serial.println("Configured as leader, starting countdown.");
     start_countdown();
   } else {
     Serial.println("Configured as follower, bypassing countdown start.");
   }
-
-//  if (digitalRead(MANUAL_ENABLE_NOT_PIN) == HIGH) {
-//    Serial.println("Starting the automatic, continuously running countdown.");
-//    start_automatic_countdown();
-//  } else {
-//    Serial.println("Requesting manual countdown startup.");
-//    start_manual_countdown();
-//    Serial.println("Returned from manual countdown startup.");
-//    vTaskDelay(pdMS_TO_TICKS(100));
-//  }
 
   Serial.println("Setup complete.");
 }

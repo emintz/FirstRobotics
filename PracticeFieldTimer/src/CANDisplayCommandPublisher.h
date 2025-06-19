@@ -33,9 +33,20 @@ class DisplayCommand;
 
 class CANDisplayCommandPublisher final :
     public DisplayCommandPublisher {
-  CanBus& can_bus;
 
+  CanBus& can_bus;
 public:
+
+  /*
+   * Constructor
+   *
+   * Parameters:
+   * ----------
+   *
+   * Name                 Contents
+   * -----------------    ------------------------------------------------
+   * can_bus              Where to publish the command
+   */
   CANDisplayCommandPublisher(CanBus& can_bus);
 
   /*

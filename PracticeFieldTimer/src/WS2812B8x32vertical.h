@@ -64,6 +64,20 @@ class WS2812B8x32vertical : public LedPanel {
 
     LedIndexer(void);
 
+    /*
+     * Translates a (row, column) pair into an offset, as explained
+     * above.
+     *
+     * Parameters:
+     * ----------
+     *
+     * Name                 Contents
+     * -----------------    ------------------------------------------------
+     * row                  Desired row in [0 .. 7]
+     * column               Desired column in [0 .. 31]
+     *
+     * Returns: the corresponding offset.
+     */
     int16_t offset_of(int row, int column) const;
   };
 

@@ -37,23 +37,94 @@ class BaseTime : public DisplayDriver {
 protected:
   BaseTime() {};
 
+  /*
+   * Turn off every pixel in the panel
+   *
+   * Parameters:
+   * ----------
+   *
+   * Name                 Contents
+   * -----------------    ------------------------------------------------
+   * panel                The LED panel to clear
+   */
   static void clear(LedPanel& panel);
 
+  /*
+   * Display a digit on the screen.
+   *
+   * Parameters:
+   * ----------
+   *
+   * Name                 Contents
+   * -----------------    ------------------------------------------------
+   * digit                Decimal digit to display, [0 .. 9]
+   * start_column         Starting column in [0 .. 31]
+   * foreground           RGB display color
+   * panel                Display on this panel
+   */
   static void display_digit(
       int digit,
       int start_column,
       const DisplayCommand::Color &foreground,
       LedPanel& panel);
 
+  /*
+   * Display a colon at the specified column
+   *
+   * Parameters:
+   * ----------
+   *
+   * Name                 Contents
+   * -----------------    ------------------------------------------------
+   * start_column         Starting column in [0 .. 31]
+   * foreground           RGB display color
+   * panel                Display on this panel
+   */
   static void display_colon(
       int start_column,
       DisplayCommand::Color foreground,
       LedPanel& panel);
 
+  /*
+   * Display the current time
+   *
+   * Parameters:
+   * ----------
+   *
+   * Name                 Contents
+   * -----------------    ------------------------------------------------
+   * command              Contains the time to display and how it should
+   *                      be displayed.
+   * panel                Display on this panel
+   */
   static void show_time(
       const DisplayCommand& command,
       LedPanel& panel);
 
+  /*
+   * Wait for the specified time if the the display is running. Do
+   * nothing if the display is not running.
+   *
+   * Parameters:
+   * ----------
+   *
+   * Name                 Contents
+   * -----------------    ------------------------------------------------
+   * running              The current running status, true if the display
+   *                      is running, false otherwise.
+   * queue                Command queue used to wait and to sense the
+   *                      running status.
+   * milliseconds         The number of milliseconds to wait.
+   *
+   * Returns: the running status, as follows:
+   *
+   *          If running is false, the panel is not running. Return
+   *          false.
+   *
+   *          If running is true, wait by peeking the queue. If a
+   *          message arrives before the peek request times out,
+   *          return false. Otherwise, return true.
+   */
   static bool wait(
       bool running,
       PullQueueHT<DisplayCommand>& queue,
