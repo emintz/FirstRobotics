@@ -299,7 +299,7 @@ void start_manual_countdown(void) {
   DisplayCommand command;
   memset(&command, 0, sizeof(command));
   command.command = DisplayCommand::Pattern::FLOOD;
-  manual_count_down->send(command);
+  manual_count_down->publish(command);
 }
 
 static void start_countdown(void) {

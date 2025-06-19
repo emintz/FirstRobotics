@@ -84,7 +84,7 @@ public:
   }
 
   /*
-   * Sends a display command to the panel server and publishes
+   * Publishes a display command to the panel server and publishes
    * it to the CAN bus, if enabled.
     *
    * Parameters:
@@ -94,7 +94,9 @@ public:
    * -----------------    ------------------------------------------------
    * command              Command to run and publish.
    */
-  void send(const DisplayCommand& command);
+  inline void publish(const DisplayCommand& command) {
+    actual_countdown.publish(command);
+  }
 
   inline bool start(void) {
     return on_pin_change.start();

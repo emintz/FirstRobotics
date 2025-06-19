@@ -64,6 +64,8 @@ public:
   virtual ~OneShotCountdown();
 
   virtual void on_countdown_complete(void) override;
+
+  void publish(const DisplayCommand& command);
 };
 
 #endif /* SRC_ONESHOTCOUNTDOWN_H_ */

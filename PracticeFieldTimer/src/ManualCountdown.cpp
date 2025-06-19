@@ -52,8 +52,3 @@ ManualCountdown::ManualCountdown(
 
 ManualCountdown::~ManualCountdown() {
 }
-
-void ManualCountdown::send(const DisplayCommand& command) {
-  command_queue.send_message(&command);
-  command_publisher(command);
-}

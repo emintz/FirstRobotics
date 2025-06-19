@@ -51,6 +51,10 @@ void OneShotCountdown::on_countdown_complete(void) {
   DisplayCommand command;
   memset(&command, 0, sizeof(command));
   command.command = DisplayCommand::Pattern::FLOOD;
+  publish(command);
+}
+
+void OneShotCountdown::publish(const DisplayCommand& command) {
   command_queue.send_message(&command);
   command_publisher(command);
 }
