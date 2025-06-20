@@ -93,7 +93,17 @@ static TimeChangeHandler incoming_time_change_handler(command_queue);
 static CanBus can_bus(CAN_RECEIVE_PIN, CAN_TRANSMIT_PIN, CanBusSpeed::BPS_100K);
 static CANDisplayCommandPublisher to_can_bus(can_bus);
 
-
+/*
+ * Raises and lowers a GPIO pin 4 times/second for one second.
+ * This is used during startup.
+   *
+   * Parameters:
+   * ----------
+   *
+   * Name                 Contents
+   * -----------------    ------------------------------------------------
+   * pin                  GPIO pin to blink.
+ */
 static void blink_it(int pin_no) {
   for (int i = 0; i < 4; ++i) {
     digitalWrite(pin_no, HIGH);
@@ -103,6 +113,10 @@ static void blink_it(int pin_no) {
   }
 }
 
+/*
+ * Configure and turn on WIFI as an access point. This is used during
+ * configuration.
+ */
 static void wifi_on(void) {
   if (!WiFi.mode(WIFI_STA) || !WiFi.begin(ssid, password)) {
     ErrorHalt::halt_and_catch_fire(
@@ -144,6 +158,9 @@ static void set_configuration_parameters(void) {
   vTaskDelay(pdMS_TO_TICKS(2000));
 }
 
+/*
+ * Turn WiFi off -- called when configuration is complete..
+ */
 static void wifi_off(void) {
   if (!WiFi.mode(WIFI_OFF)) {
     ErrorHalt::halt_and_catch_fire(
@@ -158,17 +175,22 @@ static void wifi_off(void) {
  * startup.
  */
 static void configure_if_requested(void) {
+  Serial.println("Checking for configuration request.");
   pinMode(SET_CONFIGURATION_PIN, INPUT_PULLUP);
   PressAndHold configuration_signal(
       SET_CONFIGURATION_PIN,
       PRESS_TIMEOUT_MS,
       PRESS_WINDOW_MS);
   if (configuration_signal.wait_for_press_and_hold()) {
-      wifi_on();
-      digitalWrite(BUILTIN_LED_PIN, HIGH);
-      set_configuration_parameters();
-      digitalWrite(BUILTIN_LED_PIN, LOW);
-      wifi_off();
+    Serial.println("Configuring ...");
+    wifi_on();
+    digitalWrite(BUILTIN_LED_PIN, HIGH);
+    set_configuration_parameters();
+    digitalWrite(BUILTIN_LED_PIN, LOW);
+    wifi_off();
+    Serial.println("Configuration complete.");
+  } else {
+    Serial.println("Configuration not requested.");
   }
 }
 
@@ -298,7 +320,11 @@ void start_manual_countdown(void) {
   manual_count_down->publish(command);
 }
 
-static void start_countdown(void) {
+/*
+ * Count the continuous countdown if the system is configured
+ * to run continuously, i.e. if MANUAL_ENABLE_NOT_PIN is HIGH.
+ */
+static void maybe_start_continuous_countdown(void) {
   if (digitalRead(MANUAL_ENABLE_NOT_PIN) == HIGH) {
     Serial.println("Starting the automatic, continuously running countdown.");
     start_automatic_countdown();
@@ -310,6 +336,9 @@ static void start_countdown(void) {
   }
 }
 
+/*
+ * Initialize (i.e. load the CAN driver) and start the CAN bus.
+ */
 static void start_can_bus(void) {
   Serial.println("Starting CAN bus.");
   can_bus.begin();
@@ -327,7 +356,12 @@ static void start_can_bus(void) {
   Serial.println("CAN bus is running.");
 }
 
-static void start_timer_services(void) {
+/*
+ * Start the time services. Configure the attached DS3231 to generate
+ * a 1 Hz square wave. Note that the DS3231 must be calibrated to
+ * UTC.
+ */
+static void start_time_services(void) {
   if (!Wire.begin()) {
     ErrorHalt::halt_and_catch_fire(
         I2C_STARTUP_FAILED,
@@ -359,6 +393,9 @@ static void start_timer_services(void) {
       seconds);
 }
 
+/*
+ * Configures the timer. Automatically runs once at power on.
+ */
 void setup() {
   pinMode(BUILTIN_LED_PIN, OUTPUT);
   digitalWrite(BUILTIN_LED_PIN, LOW);
@@ -381,11 +418,11 @@ void setup() {
   blink_it(YELLOW_LED_PIN);
   blink_it(GREEN_LED_PIN);
 
-  if (digitalRead(FOLLOWER_NOT_PIN) == HIGH) {
-    start_timer_services();
-  }
-
   configure_if_requested();
+
+  if (digitalRead(FOLLOWER_NOT_PIN) == HIGH) {
+    start_time_services();
+  }
 
   load_configuration();
 
@@ -401,6 +438,8 @@ void setup() {
 
   if (digitalRead(CAN_ENABLE_NOT_PIN) == LOW) {
     start_can_bus();
+  } else {
+    Serial.println("CAN bus startup not configured.");
   }
 
   DisplayCommand display_test_pattern;
@@ -413,7 +452,7 @@ void setup() {
 
   if (digitalRead(FOLLOWER_NOT_PIN) == HIGH) {
     Serial.println("Configured as leader, starting countdown.");
-    start_countdown();
+    maybe_start_continuous_countdown();
   } else {
     Serial.println("Configured as follower, bypassing countdown start.");
   }
@@ -421,6 +460,12 @@ void setup() {
   Serial.println("Setup complete.");
 }
 
+/*
+ * The Arduino framework repeatedly invokes loop(). Since all logic
+ * runs in proceses or in response to hardware interrupts, this
+ * method has nothing to do, so it just waits for the longest
+ * supported interval.
+ */
 void loop() {
   vTaskDelay(portMAX_DELAY);
 }
