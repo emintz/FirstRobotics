@@ -176,7 +176,6 @@ static void wifi_off(void) {
  */
 static void configure_if_requested(void) {
   Serial.println("Checking for configuration request.");
-  pinMode(SET_CONFIGURATION_PIN, INPUT_PULLUP);
   PressAndHold configuration_signal(
       SET_CONFIGURATION_PIN,
       PRESS_TIMEOUT_MS,
@@ -399,6 +398,7 @@ static void start_time_services(void) {
 void setup() {
   pinMode(BUILTIN_LED_PIN, OUTPUT);
   digitalWrite(BUILTIN_LED_PIN, LOW);
+  pinMode(SET_CONFIGURATION_PIN, INPUT_PULLUP);
   pinMode(RED_LED_PIN, OUTPUT);
   digitalWrite(RED_LED_PIN, LOW);
   pinMode(YELLOW_LED_PIN, OUTPUT);
