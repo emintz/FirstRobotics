@@ -31,7 +31,7 @@ class OnCompletion final : public VoidFunction {
 
 public:
   inline OnCompletion(BaseCountdown *countdown) :
-  countdown(*countdown) {
+    countdown(*countdown) {
   }
 
   virtual void apply(void) override {
@@ -78,6 +78,7 @@ BaseCountdown::~BaseCountdown() {
 }
 
 void BaseCountdown::enable(int initial_duration_seconds) {
+  Serial.printf("Countdown starting with initial duration: %d.\n", initial_duration_seconds);
   switch (state) {
   case State::CREATED:
     maybe_set_initial_duration(
