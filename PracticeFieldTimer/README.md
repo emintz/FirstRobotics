@@ -65,3 +65,11 @@ little-endian.
 
 Note that this is the second of two messages that instruct the recipient to
 display a pattern. Pattern display implementations may ignore any field.
+
+## Build Notes
+
+### LCD Module
+
+https://www.amazon.com/dp/B0D145PQDJ
+
+

@@ -27,14 +27,17 @@
 #include "DisplayDriver.h"
 #include "DisplayDrivers.h"
 #include "LedPanel.h"
+#include "StatusLcd.h"
 
 #include <memory>
 
 PanelServer::PanelServer(
     PullQueueHT<DisplayCommand> &queue,
-    LedPanel &panel) :
+    LedPanel &panel,
+    StatusLcd& lcd) :
         queue(queue),
-        panel(panel) {
+        panel(panel),
+        lcd(lcd) {
 }
 
 PanelServer::~PanelServer() {
@@ -53,9 +56,11 @@ void PanelServer::run(void) {
     std::shared_ptr<DisplayDriver> driver_ptr =
         DisplayDrivers::drivers[pattern];
     if (driver_ptr) {
+      lcd.show_time(display_command.time_in_seconds);
       (*driver_ptr)(queue, display_command, panel);
     } else {
       Serial.println("Error: NULL display driver.");
+      lcd.health("NULL display driver");
       Serial.flush();
     }
   }

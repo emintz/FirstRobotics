@@ -1,11 +1,11 @@
 /*
- * ErrorHalt.h
+ * PracticeFieldTimer.h
  *
- *  Created on: Apr 26, 2025
+ *  Created on: Jul 2, 2025
  *      Author: Eric Mintz
  *
- * Error halt, blinks an error code and runs an endless loop that
- * effectively halts the computer.
+ * Provides external access to resources in the main sketch,
+ * PracticeFieldTimer.ino.
  *
  * Copyright (C) 2025 Eric Mintz
  * All Rights Reserved
@@ -24,30 +24,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef ERRORHALT_H_
-#define ERRORHALT_H_
+#ifndef SRC_PRACTICEFIELDTIMER_H_
+#define SRC_PRACTICEFIELDTIMER_H_
 
 class StatusLcd;
 
-class ErrorHalt {
-  StatusLcd *status_display;
-public:
-  ErrorHalt();
+StatusLcd& global_status_display(void);
 
-  static const ErrorHalt INSTANCE;
 
-  void begin(StatusLcd *status_display) {
-    this->status_display = status_display;
-  }
 
-  void operator() (int error_code, const char *console_message) const;
-
-  /*
-   * Displays a message no the console, starts an error blink, then
-   * effectively halts the machine. This method never returns; reboot
-   * is required.
-   */
-  static void halt_and_catch_fire(int error_code, const char *message);
-};
-
-#endif /* ERRORHALT_H_ */
+#endif /* SRC_PRACTICEFIELDTIMER_H_ */

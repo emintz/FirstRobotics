@@ -40,15 +40,22 @@
 #include "PinAssignments.h"
 #include "PressAndHold.h"
 #include "PullQueueHT.h"
+#include "StatusLcd.h"
 #include "TaskPriorities.h"
 #include "TaskWithActionH.h"
 #include "TimeChangeHandler.h"
 #include "WS2812B8x32vertical.h"
 
+#include <LiquidCrystal_I2C.h>
 #include <WiFi.h>
 #include <Wire.h>
 
 #include <memory>
+
+// Status LCD configuration
+#define LCD_ADDRESS 0x27
+#define LCD_COLUMNS 20
+#define LCD_ROWS 4
 
 // User must press and hold the configuration reset button
 // for three seconds within 5 seconds after power on.
@@ -62,6 +69,11 @@ static const IPAddress local_ip(192, 168, 251, 4);
 static const IPAddress gateway(192, 168, 251, 1);
 static const IPAddress subnet(255, 255, 255, 0);
 
+// Status LCD support
+static LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_COLUMNS, LCD_ROWS);
+static StatusLcd status_display(lcd);
+
+// Time configuration.
 static int32_t reference_time_utc = 0;
 static int32_t auto_field_time_minutes = 0;
 static int32_t manual_field_time_minutes = 0;
@@ -79,7 +91,7 @@ static constexpr const char *nvs_namespace = "field-timer";
 static DS3231_TimeSource ds3231;
 static PullQueueHT<DisplayCommand> command_queue(4);
 static WS2812B8x32vertical panel;
-static PanelServer server(command_queue, panel);
+static PanelServer server(command_queue, panel, status_display);
 static TaskWithActionH server_task(
     "Panel",
     PANEL_PRIORITY,
@@ -92,6 +104,10 @@ static std::unique_ptr<ManualCountdown> manual_count_down;
 static TimeChangeHandler incoming_time_change_handler(command_queue);
 static CanBus can_bus(CAN_RECEIVE_PIN, CAN_TRANSMIT_PIN, CanBusSpeed::BPS_100K);
 static CANDisplayCommandPublisher to_can_bus(can_bus);
+
+StatusLcd& global_status_display(void) {
+  return status_display;
+}
 
 /*
  * Raises and lowers a GPIO pin 4 times/second for one second.
@@ -342,6 +358,7 @@ static void start_can_bus(void) {
   Serial.println("Starting CAN bus.");
   can_bus.begin();
   if (CanBusInitStatus::FAILED == can_bus.init()) {
+    status_display.can_bus_status("Init Failed");
     ErrorHalt::halt_and_catch_fire(
         CAN_INIT_FAILED,
         "Can bus initialization failed.");
@@ -351,8 +368,24 @@ static void start_can_bus(void) {
     ErrorHalt::halt_and_catch_fire(
         CAN_START_FAILED,
         "Can bus startup failed.");
+    status_display.can_bus_status("Start Failed");
   }
+  status_display.can_bus_status("OK");
   Serial.println("CAN bus is running.");
+}
+
+/*
+ * Initialize the I2C bus and start the status display
+ */
+static void init_i2c(void) {
+  if (!Wire.begin()) {
+    ErrorHalt::halt_and_catch_fire(
+        I2C_STARTUP_FAILED,
+        "I2C bus initialization failed.");
+  }
+  lcd.init();
+  lcd.backlight();
+  status_display.health("Setup");
 }
 
 /*
@@ -361,11 +394,6 @@ static void start_can_bus(void) {
  * UTC.
  */
 static void start_time_services(void) {
-  if (!Wire.begin()) {
-    ErrorHalt::halt_and_catch_fire(
-        I2C_STARTUP_FAILED,
-        "Two-Wire (I2C) bus initialization failed.");
-  }
   if (!ds3231.begin()) {
     ErrorHalt::halt_and_catch_fire(
         DS3231_STARTUP_FAILED,
@@ -412,6 +440,10 @@ void setup() {
 
   Serial.begin(115200);
   Serial.println("Serial I/O initialized.");
+  Serial.printf("Practice field timer compiled on %s at %s.\n",
+      __DATE__, __TIME__);
+
+  init_i2c();
 
   blink_it(BUILTIN_LED_PIN);
   blink_it(RED_LED_PIN);
@@ -422,6 +454,9 @@ void setup() {
 
   if (digitalRead(FOLLOWER_NOT_PIN) == HIGH) {
     start_time_services();
+    status_display.leader();
+  } else {
+    status_display.follower();
   }
 
   load_configuration();
@@ -457,6 +492,7 @@ void setup() {
     Serial.println("Configured as follower, bypassing countdown start.");
   }
 
+  status_display.health("Running");
   Serial.println("Setup complete.");
 }
 

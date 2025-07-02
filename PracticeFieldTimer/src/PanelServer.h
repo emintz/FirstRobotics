@@ -33,10 +33,12 @@
 #include "TaskAction.h"
 
 class LedPanel;
+class StatusLcd;
 
 class PanelServer : public TaskAction {
   PullQueueHT<DisplayCommand> &queue;
   LedPanel &panel;
+  StatusLcd& lcd;
 public:
   /*
    * Constructor
@@ -51,7 +53,8 @@ public:
    */
   PanelServer(
       PullQueueHT<DisplayCommand> &queue,
-      LedPanel &panel);
+      LedPanel &panel,
+      StatusLcd& lcd);
   virtual ~PanelServer();
 
   /*
