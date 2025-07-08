@@ -146,6 +146,13 @@ static void wifi_on(void) {
   }
 }
 
+static void show_wifi_setup(void) {
+  status_display.clear();
+  status_display.ssid(WiFi.softAPSSID().c_str());
+  status_display.password(password);
+  status_display.url_path(local_ip.toString().c_str());
+}
+
 /*
  * Read the configuration parameter values from the web
  * service and persist them in NVS.
@@ -200,7 +207,9 @@ static void configure_if_requested(void) {
     Serial.println("Configuring ...");
     wifi_on();
     digitalWrite(BUILTIN_LED_PIN, HIGH);
+    show_wifi_setup();
     set_configuration_parameters();
+    status_display.clear();
     digitalWrite(BUILTIN_LED_PIN, LOW);
     wifi_off();
     Serial.println("Configuration complete.");

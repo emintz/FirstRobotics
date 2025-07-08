@@ -58,6 +58,10 @@ void StatusLcd::can_bus_status(const char *message) {
   display(message_column, CAN_STATUS_ROW, message);
 }
 
+void StatusLcd::clear(void) {
+  lcd.clear();
+}
+
 void StatusLcd::follower(void) {
   display(LEAD_FOLLOW_COLUMN, LEAD_FOLLOW_ROW, "Follow");
 }
@@ -71,7 +75,17 @@ void StatusLcd::leader(void) {
   display(LEAD_FOLLOW_COLUMN, LEAD_FOLLOW_ROW, "Lead  ");
 }
 
-void StatusLcd::show_time(uint16_t time_remaining) {
+void StatusLcd::password(const char *wifi_password) {
+  size_t password_column = display(0, 1, "PW: ");
+  display(password_column, 1, wifi_password);
+}
+
+void StatusLcd::ssid(const char *ssid) {
+  size_t ssid_column = display(0, 0, "SSID: ");
+  display(ssid_column, 0, ssid);
+}
+
+void StatusLcd::time(uint16_t time_remaining) {
   char formatted_time[6];
   uint16_t seconds = time_remaining % 60;
   uint16_t minutes = time_remaining / 60;
@@ -86,4 +100,9 @@ void StatusLcd::show_time(uint16_t time_remaining) {
       ? minutes + '0'
       : ' ';
   display(TIME_COLUMN, TIME_ROW, formatted_time);
+}
+
+void StatusLcd::url_path(const char *config_ip) {
+  size_t ip_column = display(0, 2, "IP: ");
+  display(ip_column, 2, config_ip);
 }

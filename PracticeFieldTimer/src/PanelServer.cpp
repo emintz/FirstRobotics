@@ -56,7 +56,7 @@ void PanelServer::run(void) {
     std::shared_ptr<DisplayDriver> driver_ptr =
         DisplayDrivers::drivers[pattern];
     if (driver_ptr) {
-      lcd.show_time(display_command.time_in_seconds);
+      lcd.time(display_command.time_in_seconds);
       (*driver_ptr)(queue, display_command, panel);
     } else {
       Serial.println("Error: NULL display driver.");

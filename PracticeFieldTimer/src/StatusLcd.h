@@ -46,8 +46,10 @@ class StatusLcd {
    * column            Starting column, 0-based
    * row               Starting row, 0-based
    * message           Null-terminated message to display. Behavior is
-   *                   unspecified if the message overhangs the specified
-   *                   row.
+   *                   unspecified if the message cannot fit in the
+   *                   specified  row.
+   *
+   * Returns: the number of characters written
    */
   size_t display(uint8_t column, uint8_t row, const char *message);
 
@@ -77,6 +79,11 @@ public:
    */
   void can_bus_status(const char *message);
 
+  /**
+   * Clear the display.
+   */
+  void clear(void);
+
   /*
    * Display follower status. Invoke this when the timer follows a
    * leader, i.e. a time provider.
@@ -100,6 +107,26 @@ public:
   void leader(void);
 
   /*
+   * Display the WiFi password during configuration
+   *
+   * Name              Contents
+   * ----------------- ---------------------------------------------------
+   * wifi_password     NULL-terminated WiFi password to display. Cannot
+   *                   be NULL, and must fit in its allotted space.
+   */
+  void password(const char *wifi_password);
+
+  /*
+   * Display the WiFi access point SSID during configuration.
+   *
+   * Name              Contents
+   * ----------------- ---------------------------------------------------
+   * message           NULL-terminated SSID (network name) to display. Cannot
+   *                   be NULL, and must fit in its allotted space.
+   */
+  void ssid(const char *ssid);
+
+  /*
    * Display the number of seconds remaining in the current practice
    * session.
    *
@@ -111,7 +138,19 @@ public:
    * time_remaining    The number of seconds remaining in the current
    *                   practice session.
    */
-  void show_time(uint16_t time_remaining);
+  void time(uint16_t time_remaining);
+
+  /*
+   * Display the configuration page URL during configuration. This is
+   * the path of the URL that accesses the configuration page.
+   *
+   * Name              Contents
+   * ----------------- ---------------------------------------------------
+   * config_ip         NULL-terminated configuration page URL IP address
+   *                   to display. Cannot be NULL, and must fit in its
+   *                   allotted space.
+   */
+  void url_path(const char *config_ip);
 };
 
 #endif /* STATUSLCD_H_ */
