@@ -25,8 +25,8 @@
 #define CAN_STATUS_COLUMN 7
 #define CAN_STATUS_LENGTH 13
 #define CAN_STATUS_ROW 1
-#define LEAD_FOLLOW_COLUMN 0
-#define LEAD_FOLLOW_ROW 1
+#define MODE_COLUMN 0
+#define MODE_ROW 1
 #define OVERALL_HEALTH_COLUMN 0
 #define OVERALL_HEALTH_LENGTH 20
 #define OVERALL_HEALTH_ROW 3
@@ -40,6 +40,7 @@ void StatusLcd::clear_field(uint8_t column, uint8_t row, uint8_t size) {
 }
 
 size_t StatusLcd::display(uint8_t column, uint8_t row, const char *message) {
+  Serial.printf(" At (%d, %d) displaying >>>%s<<<\n", row, column, message);
   lcd.setCursor(column, row);
   return lcd.print(message);
 }
@@ -49,6 +50,10 @@ StatusLcd::StatusLcd(LiquidCrystal_I2C& lcd) :
 }
 
 StatusLcd::~StatusLcd() {
+}
+
+void StatusLcd::automatic_mode() {
+  display(MODE_COLUMN, MODE_ROW, "Auto  ");
 }
 
 void StatusLcd::can_bus_status(const char *message) {
@@ -62,8 +67,8 @@ void StatusLcd::clear(void) {
   lcd.clear();
 }
 
-void StatusLcd::follower(void) {
-  display(LEAD_FOLLOW_COLUMN, LEAD_FOLLOW_ROW, "Follow");
+void StatusLcd::follow_mode(void) {
+  display(MODE_COLUMN, MODE_ROW, "Follow");
 }
 
 void StatusLcd::health(const char *message) {
@@ -71,8 +76,8 @@ void StatusLcd::health(const char *message) {
   display(OVERALL_HEALTH_COLUMN, OVERALL_HEALTH_ROW, message);
 }
 
-void StatusLcd::leader(void) {
-  display(LEAD_FOLLOW_COLUMN, LEAD_FOLLOW_ROW, "Lead  ");
+void StatusLcd::manual_mode() {
+  display(MODE_COLUMN, MODE_ROW, "Manual");
 }
 
 void StatusLcd::password(const char *wifi_password) {
@@ -86,7 +91,7 @@ void StatusLcd::ssid(const char *ssid) {
 }
 
 void StatusLcd::time(uint16_t time_remaining) {
-  char formatted_time[6];
+  char formatted_time[10];
   uint16_t seconds = time_remaining % 60;
   uint16_t minutes = time_remaining / 60;
   memset(formatted_time, 0, sizeof(formatted_time));
@@ -99,6 +104,7 @@ void StatusLcd::time(uint16_t time_remaining) {
   formatted_time[0] = minutes
       ? minutes + '0'
       : ' ';
+  Serial.printf("Current time: %s\n", formatted_time);
   display(TIME_COLUMN, TIME_ROW, formatted_time);
 }
 

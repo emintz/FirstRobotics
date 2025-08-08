@@ -80,10 +80,12 @@ static int32_t manual_field_time_minutes = 0;
 
 static int16_t time_remaining = 0;
 
-// We want the time display to turn gradually from blue to
-// red as time elapses. We want the display to be completely
-// red for the last minute. setup() will set these constants
-// to enable this.
+/*
+ * We want the time display to turn gradually from blue to
+ * red as time elapses. We want the display to be completely
+ * red for the last minute. setup() will set these constants
+ * to enable this.
+ */
 static int16_t all_red_period = 60;
 
 static constexpr const char *nvs_namespace = "field-timer";
@@ -104,10 +106,6 @@ static std::unique_ptr<ManualCountdown> manual_count_down;
 static TimeChangeHandler incoming_time_change_handler(command_queue);
 static CanBus can_bus(CAN_RECEIVE_PIN, CAN_TRANSMIT_PIN, CanBusSpeed::BPS_100K);
 static CANDisplayCommandPublisher to_can_bus(can_bus);
-
-StatusLcd& global_status_display(void) {
-  return status_display;
-}
 
 /*
  * Raises and lowers a GPIO pin 4 times/second for one second.
@@ -144,6 +142,13 @@ static void wifi_on(void) {
         WIFI_IP_SETUP_FAILED,
         "Could not configure WIFI IP address.");
   }
+}
+
+static void clear_panel(void) {
+  DisplayCommand command;
+  memset(&command, 0, sizeof(command));
+  command.command = DisplayCommand::Pattern::FLOOD;
+  command_queue.send_message(&command);
 }
 
 static void show_wifi_setup(void) {
@@ -338,10 +343,7 @@ void start_manual_countdown(void) {
       command_queue,
       to_can_bus);
   manual_count_down->start();
-  DisplayCommand command;
-  memset(&command, 0, sizeof(command));
-  command.command = DisplayCommand::Pattern::FLOOD;
-  manual_count_down->publish(command);
+  clear_panel();
 }
 
 /*
@@ -352,12 +354,15 @@ static void maybe_start_continuous_countdown(void) {
   if (digitalRead(MANUAL_ENABLE_NOT_PIN) == HIGH) {
     Serial.println("Starting the automatic, continuously running countdown.");
     start_automatic_countdown();
+    status_display.automatic_mode();
   } else {
     Serial.println("Requesting manual countdown startup.");
     start_manual_countdown();
-    Serial.println("Returned from manual countdown startup.");
+    // Needed to avoid race condition. TODO: find out why.
     vTaskDelay(pdMS_TO_TICKS(100));
+    status_display.manual_mode();
   }
+  vTaskDelay(pdMS_TO_TICKS(100));
 }
 
 /*
@@ -463,9 +468,6 @@ void setup() {
 
   if (digitalRead(FOLLOWER_NOT_PIN) == HIGH) {
     start_time_services();
-    status_display.leader();
-  } else {
-    status_display.follower();
   }
 
   load_configuration();
@@ -498,6 +500,8 @@ void setup() {
     Serial.println("Configured as leader, starting countdown.");
     maybe_start_continuous_countdown();
   } else {
+    status_display.follow_mode();
+    clear_panel();
     Serial.println("Configured as follower, bypassing countdown start.");
   }
 
