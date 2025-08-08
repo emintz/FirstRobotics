@@ -65,7 +65,7 @@ BaseCountdown::BaseCountdown(
       "continuous",
       COUNTDOWN_TASK_PRIORITY,
       timer.get(),
-      4096);
+      8192);
   notify_function = std::make_unique<NotifyFromISR>(task.get());
   sqw_detector = std::make_unique<GpioChangeDetector>(
       sqw_pin,
