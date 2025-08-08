@@ -52,7 +52,7 @@ void PanelServer::run(void) {
        got_one = queue.pull_message(&display_command);
     } while (!got_one);
     DisplayCommand::Pattern pattern =
-        static_cast<DisplayCommand::Pattern>( display_command.command);
+        static_cast<DisplayCommand::Pattern>(display_command.command);
     std::shared_ptr<DisplayDriver> driver_ptr =
         DisplayDrivers::drivers[pattern];
     if (driver_ptr) {
