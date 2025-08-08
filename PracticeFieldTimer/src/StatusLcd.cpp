@@ -40,7 +40,7 @@ void StatusLcd::clear_field(uint8_t column, uint8_t row, uint8_t size) {
 }
 
 size_t StatusLcd::display(uint8_t column, uint8_t row, const char *message) {
-  Serial.printf(" At (%d, %d) displaying >>>%s<<<\n", row, column, message);
+//  Serial.printf(" At (%d, %d) displaying >>>%s<<<\n", row, column, message);
   lcd.setCursor(column, row);
   return lcd.print(message);
 }
@@ -104,7 +104,7 @@ void StatusLcd::time(uint16_t time_remaining) {
   formatted_time[0] = minutes
       ? minutes + '0'
       : ' ';
-  Serial.printf("Current time: %s\n", formatted_time);
+//  Serial.printf("Current time: %s\n", formatted_time);
   display(TIME_COLUMN, TIME_ROW, formatted_time);
 }
 
