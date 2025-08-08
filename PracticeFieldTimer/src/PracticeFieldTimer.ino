@@ -484,8 +484,6 @@ void setup() {
 
   if (digitalRead(CAN_ENABLE_NOT_PIN) == LOW) {
     start_can_bus();
-  } else {
-    Serial.println("CAN bus startup not configured.");
   }
 
   DisplayCommand display_test_pattern;
@@ -502,6 +500,7 @@ void setup() {
   } else {
     status_display.follow_mode();
     clear_panel();
+    vTaskDelay(pdMS_TO_TICKS(100));
     Serial.println("Configured as follower, bypassing countdown start.");
   }
 
