@@ -36,8 +36,8 @@ void FloodPanel::operator()(
     const DisplayCommand &command,
     LedPanel &panel) {
   panel.flood(
-      command.foreground.red,
-      command.foreground.green,
-      command.foreground.blue);
-  panel.update();
+        command.foreground.red,
+        command.foreground.green,
+        command.foreground.blue)
+      .update();
 }
