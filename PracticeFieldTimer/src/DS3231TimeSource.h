@@ -26,11 +26,11 @@
 #ifndef DS3231TIMESOURCE_H_
 #define DS3231TIMESOURCE_H_
 
+
+#include <RTClib.h>
 #include "TimeSource.h"
 
-#include "RTClib.h"
-
-class DS3231_TimeSource : TimeSource {
+class DS3231_TimeSource : public TimeSource {
 
   RTC_DS3231 ds3231;
 

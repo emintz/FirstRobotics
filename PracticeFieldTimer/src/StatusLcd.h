@@ -37,7 +37,7 @@ class StatusLcd {
 
   /*
    * Display a message starting at a specified column and row.
-    *
+   *
    * Parameters:
    * ----------
    *

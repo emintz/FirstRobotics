@@ -30,6 +30,7 @@
 #include "CanEnumerations.h"
 #include "Configurator.h"
 #include "ContinuousCountdown.h"
+#include <DataTypeCharacteristics.h>
 #include "DataTypes.h"
 #include "DisplayCommand.h"
 #include "DS3231TimeSource.h"
@@ -40,6 +41,7 @@
 #include "PinAssignments.h"
 #include "PressAndHold.h"
 #include "PullQueueHT.h"
+#include <SetBlankValue.h>
 #include "StatusLcd.h"
 #include "TaskPriorities.h"
 #include "TaskWithActionH.h"
@@ -163,7 +165,10 @@ static void show_wifi_setup(void) {
  * service and persist them in NVS.
  */
 static void set_configuration_parameters(void) {
+  digitalWrite(GREEN_LED_PIN, HIGH);
+  digitalWrite(YELLOW_LED_PIN, HIGH);
   Configurator configurator(nvs_namespace);
+  std::map<const std::string, std::string> submit_attributes;
   DataTypes data_types;
   configurator
       .add_field(
@@ -184,6 +189,8 @@ static void set_configuration_parameters(void) {
         "Timer configuration failed.");
   }
   vTaskDelay(pdMS_TO_TICKS(2000));
+  digitalWrite(GREEN_LED_PIN, LOW);
+  digitalWrite(YELLOW_LED_PIN, LOW);
 }
 
 /*

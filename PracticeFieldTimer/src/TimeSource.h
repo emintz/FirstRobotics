@@ -34,7 +34,7 @@ class TimeSource {
 protected:
   TimeSource(void) {}
 public:
-  virtual ~TimeSource();
+  virtual ~TimeSource() = default;
 
   /*
    * Connects to the time keeping peripheral. Incoming

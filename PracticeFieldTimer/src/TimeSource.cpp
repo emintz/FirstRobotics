@@ -23,7 +23,3 @@
 
 #include "TimeSource.h"
 
-
-TimeSource::~TimeSource() {
-}
-
