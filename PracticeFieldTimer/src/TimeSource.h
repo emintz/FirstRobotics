@@ -27,7 +27,7 @@
 #ifndef TIMESOURCE_H_
 #define TIMESOURCE_H_
 
-#include "Arduino.h"
+#include <Arduino.h>
 
 class TimeSource {
 
@@ -48,7 +48,11 @@ public:
    * Returns the number of seconds since the most recent midnight.
    * The results will be in [0 .. 86400).
    */
-  virtual int seconds_since_midnight(void) = 0;
+  virtual uint64_t seconds_since_midnight(void) = 0;
+
+  virtual bool set_date_and_time(uint64_t unix_timestamp) = 0;
+
+  virtual uint64_t unix_time(void) = 0;
 };
 
 #endif /* TIMESOURCE_H_ */

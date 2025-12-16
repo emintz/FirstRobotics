@@ -26,9 +26,10 @@
 #ifndef DS3231TIMESOURCE_H_
 #define DS3231TIMESOURCE_H_
 
-
-#include <RTClib.h>
 #include "TimeSource.h"
+
+#include <Arduino.h>
+#include <RTClib.h>
 
 class DS3231_TimeSource : public TimeSource {
 
@@ -59,7 +60,11 @@ public:
   /*
    * Provides the current time as seconds since midnight UTC.
    */
-  virtual int seconds_since_midnight(void) override;
+  virtual uint64_t seconds_since_midnight(void) override;
+
+  virtual bool set_date_and_time(uint64_t unix_timestamp);
+
+  virtual uint64_t unix_time(void) override;
 };
 
 #endif /* DS3231TIMESOURCE_H_ */

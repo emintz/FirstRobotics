@@ -37,7 +37,17 @@ bool DS3231_TimeSource::begin(void) {
   return status;
 }
 
-int DS3231_TimeSource::seconds_since_midnight(void) {
+uint64_t DS3231_TimeSource::seconds_since_midnight(void) {
   auto now = ds3231.now();
   return now.hour() * 3600 + now.minute() * 60 + now.second();
+}
+
+bool DS3231_TimeSource::set_date_and_time(uint64_t unix_timestamp) {
+  DateTime time_to_set(unix_timestamp);
+  ds3231.adjust(time_to_set);
+  return true;
+}
+
+uint64_t DS3231_TimeSource::unix_time(void) {
+  return static_cast<uint64_t>(ds3231.now().unixtime());
 }
