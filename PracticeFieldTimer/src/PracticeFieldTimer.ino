@@ -46,6 +46,7 @@
 #include "TaskPriorities.h"
 #include "TaskWithActionH.h"
 #include "TimeChangeHandler.h"
+#include "WebServer.h"
 #include "WS2812B8x32vertical.h"
 
 #include <LiquidCrystal_I2C.h>
@@ -108,6 +109,7 @@ static std::unique_ptr<ManualCountdown> manual_count_down;
 static TimeChangeHandler incoming_time_change_handler(command_queue);
 static CanBus can_bus(CAN_RECEIVE_PIN, CAN_TRANSMIT_PIN, CanBusSpeed::BPS_100K);
 static CANDisplayCommandPublisher to_can_bus(can_bus);
+static WebServer web_server;
 
 /*
  * Raises and lowers a GPIO pin 4 times/second for one second.
@@ -183,7 +185,7 @@ static void set_configuration_parameters(void) {
           "manual-time",
           "Manual Mode Cycle Time (Minutes)",
           data_types.int32);
-  if (!configurator.run()) {
+  if (!configurator.run(web_server)) {
     ErrorHalt::halt_and_catch_fire(
         SYSTEM_NOT_CONFIGURED,
         "Timer configuration failed.");
