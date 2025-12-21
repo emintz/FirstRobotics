@@ -46,6 +46,7 @@
 #include "StatusLcd.h"
 #include "TaskPriorities.h"
 #include "TaskWithActionH.h"
+#include "TextDisplay.h"
 #include "TimeChangeHandler.h"
 #include "TimeRequestHandlers.h"
 #include "WebServer.h"
@@ -64,6 +65,106 @@
 // for three seconds within 5 seconds after power on.
 #define PRESS_TIMEOUT_MS 3000
 #define PRESS_WINDOW_MS 5000
+
+// Bitmap representing "CONFIG" to be displayed
+// when the web page is active.
+static constexpr const uint8_t config_bitmap[] = {
+//  Bits           Column
+//  -----------    ------
+    0b00000000, //  0
+
+    // C
+    0b01111110, //  1
+    0b10000001, //  2
+    0b10000001, //  3
+    0b10000001, //  4
+    0b01000010, //  5
+    0b00000000, //  6
+
+    // O
+    0b01111110, //  7
+    0b10000001, //  8
+    0b10000001, //  9
+    0b10000001, // 10
+    0b01111110, // 11
+    0b00000000, // 12
+
+    // N
+    0b11111111, // 13
+    0b01000000, // 14
+    0b00100000, // 15
+    0b00010000, // 16
+    0b11111111, // 17
+    0b00000000, // 18
+
+    // F
+    0b11111111, // 19
+    0b10010000, // 20
+    0b10010000, // 21
+    0b10010000, // 22
+    0b10000000, // 23
+    0b00000000, // 24
+
+    // I
+    0b11111111, // 25
+    0b00000000, // 26
+
+    // G
+    0b01111110, // 27
+    0b10000001, // 28
+    0b10010001, // 29
+    0b10010001, // 30
+    0b01001110, // 31
+};
+
+// Bitmap spelling SETUP, to be displayed at power on
+const uint8_t setup_bitmap[] = {
+//  Bits           Column
+//  -----------    ------
+    0b00000000, //  0
+    0b00000000, //  1
+
+    // S
+    0b01100010, //  2
+    0b10010001, //  3
+    0b10010001, //  4
+    0b10010001, //  5
+    0b01001110, //  6
+    0b00000000, //  7
+
+    // E
+    0b11111111, //  8
+    0b10010001, //  9
+    0b10010001, // 10
+    0b10010001, // 11
+    0b10000001, // 12
+    0b00000000, // 13
+
+    // T
+    0b10000000, // 14
+    0b10000000, // 15
+    0b11111111, // 16
+    0b10000000, // 17
+    0b10000000, // 18
+
+    // U
+    0b11111110, // 19
+    0b00000001, // 20
+    0b00000001, // 21
+    0b00000001, // 22
+    0b11111110, // 23
+    0b00000000, // 24
+
+    // P
+    0b11111111, // 25
+    0b10010000, // 26
+    0b10010000, // 27
+    0b10010000, // 28
+    0b01100000, // 29
+    0b00000000, // 30
+
+    0b00000000, // 31
+};
 
 // WiFi access point configuration
 static constexpr const char *ssid = "FieldTimer";
@@ -220,6 +321,8 @@ static void configure_if_requested(void) {
       PRESS_TIMEOUT_MS,
       PRESS_WINDOW_MS);
   if (configuration_signal.wait_for_press_and_hold()) {
+    TextDisplay display;
+    display(config_bitmap, {0, 0, 63}, panel);
     Serial.println("Configuring ...");
     wifi_on();
     digitalWrite(BUILTIN_LED_PIN, HIGH);
@@ -228,6 +331,7 @@ static void configure_if_requested(void) {
     status_display.clear();
     digitalWrite(BUILTIN_LED_PIN, LOW);
     wifi_off();
+    panel.clear();
     Serial.println("Configuration complete.");
   } else {
     Serial.println("Configuration not requested.");
@@ -468,6 +572,10 @@ void setup() {
   Serial.printf("Practice field timer compiled on %s at %s.\n",
       __DATE__, __TIME__);
 
+  panel.clear();
+  TextDisplay text_display;
+  text_display(setup_bitmap, {0, 63, 0}, panel);
+
   init_i2c();
 
   blink_it(BUILTIN_LED_PIN);
@@ -498,13 +606,7 @@ void setup() {
     start_can_bus();
   }
 
-  DisplayCommand display_test_pattern;
-  memset(&display_test_pattern, 0, sizeof(display_test_pattern));
-  display_test_pattern.command = DisplayCommand::Pattern::TEST_PATTERN;
-  command_queue.send_message(&display_test_pattern);
-  Serial.println("Displaying test pattern.");
   vTaskDelay(pdMS_TO_TICKS(10000));
-
 
   if (digitalRead(FOLLOWER_NOT_PIN) == HIGH) {
     Serial.println("Configured as leader, starting countdown.");

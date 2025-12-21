@@ -40,7 +40,7 @@ public:
    *
    * Name                 Contents
    * -----------------    ------------------------------------------------
-   *  command_queue       The pull queue that provides the commands. This
+   * command_queue        The pull queue that provides the commands. This
    *                      is used to generate time delays that expire when
    *                      a message arrives (via PullQueueHT::peek()).
    * command              What to display
