@@ -29,6 +29,7 @@
 #include "CANDisplayCommandPublisher.h"
 #include "CanEnumerations.h"
 #include "Configurator.h"
+#include "ConfigurationCancelledPage.h"
 #include "ContinuousCountdown.h"
 #include <DataTypeCharacteristics.h>
 #include "DataTypes.h"
@@ -46,14 +47,13 @@
 #include "TaskPriorities.h"
 #include "TaskWithActionH.h"
 #include "TimeChangeHandler.h"
+#include "TimeRequestHandlers.h"
 #include "WebServer.h"
 #include "WS2812B8x32vertical.h"
 
 #include <LiquidCrystal_I2C.h>
 #include <WiFi.h>
 #include <Wire.h>
-
-#include <memory>
 
 // Status LCD configuration
 #define LCD_ADDRESS 0x27
@@ -169,6 +169,8 @@ static void show_wifi_setup(void) {
 static void set_configuration_parameters(void) {
   digitalWrite(GREEN_LED_PIN, HIGH);
   digitalWrite(YELLOW_LED_PIN, HIGH);
+  TimeRequestHandlers set_time(ds3231);
+  web_server.addHandler(&set_time);
   Configurator configurator(nvs_namespace);
   std::map<const std::string, std::string> submit_attributes;
   DataTypes data_types;
@@ -185,7 +187,7 @@ static void set_configuration_parameters(void) {
           "manual-time",
           "Manual Mode Cycle Time (Minutes)",
           data_types.int32);
-  if (!configurator.run(web_server)) {
+  if (!configurator.run(web_server, "/configure-sessions")) {
     ErrorHalt::halt_and_catch_fire(
         SYSTEM_NOT_CONFIGURED,
         "Timer configuration failed.");
@@ -259,6 +261,7 @@ static void read_eeprom(
     ErrorHalt::halt_and_catch_fire(
         INCOMPLETE_CONFIGURATION,
         "Missing configuration parameter.");
+    break;
   default:
     ErrorHalt::halt_and_catch_fire(
         CORRUPT_CONFIGURATION,
@@ -367,7 +370,6 @@ static void maybe_start_continuous_countdown(void) {
   } else {
     Serial.println("Requesting manual countdown startup.");
     start_manual_countdown();
-    // Needed to avoid race condition. TODO: find out why.
     vTaskDelay(pdMS_TO_TICKS(100));
     status_display.manual_mode();
   }
@@ -473,11 +475,12 @@ void setup() {
   blink_it(YELLOW_LED_PIN);
   blink_it(GREEN_LED_PIN);
 
-  configure_if_requested();
-
   if (digitalRead(FOLLOWER_NOT_PIN) == HIGH) {
     start_time_services();
+    Serial.println("DS3231 started.");
   }
+
+  configure_if_requested();
 
   load_configuration();
 
@@ -519,7 +522,7 @@ void setup() {
 
 /*
  * The Arduino framework repeatedly invokes loop(). Since all logic
- * runs in proceses or in response to hardware interrupts, this
+ * runs in processes or in response to hardware interrupts, this
  * method has nothing to do, so it just waits for the longest
  * supported interval.
  */
