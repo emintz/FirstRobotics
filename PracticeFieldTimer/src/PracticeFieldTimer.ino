@@ -69,8 +69,8 @@
 // Bitmap representing "CONFIG" to be displayed
 // when the web page is active.
 static constexpr const uint8_t config_bitmap[] = {
-//  Bits           Column
-//  -----------    ------
+//  Bits        Column
+//  ----------- ------
     0b00000000, //  0
 
     // C
@@ -119,8 +119,8 @@ static constexpr const uint8_t config_bitmap[] = {
 
 // Bitmap spelling SETUP, to be displayed at power on
 const uint8_t setup_bitmap[] = {
-//  Bits           Column
-//  -----------    ------
+//  Bits        Column
+//  ----------- ------
     0b00000000, //  0
     0b00000000, //  1
 
@@ -164,6 +164,55 @@ const uint8_t setup_bitmap[] = {
     0b00000000, // 30
 
     0b00000000, // 31
+};
+
+// Bitmap spelling WAIT, to be displayed after the user
+// finishes configuring the timer
+static constexpr const uint8_t wait_bitmap[] = {
+//  Bits        Column
+//  ----------- ------
+    0b00000000, //  0
+    0b00000000, //  1
+    0b00000000, //  2
+    0b00000000, //  3
+    0b00000000, //  4
+    0b00000000, //  5
+
+    // W
+    0b11111111, //  6
+    0b00000010, //  7
+    0b00000100, //  8
+    0b00000010, //  9
+    0b11111111, // 10
+    0b00000000, // 11
+
+    // A
+    0b00111111, // 12
+    0b01001000, // 13
+    0b10001000, // 14
+    0b01001000, // 15
+    0b00111111, // 16
+    0b00000000, // 17
+
+    // I
+    0b11111111, // 18
+    0b00000000, // 19
+
+    // T
+    0b10000000, // 20
+    0b10000000, // 21
+    0b11111111, // 22
+    0b10000000, // 23
+    0b10000000, // 24
+    0b00000000, // 25
+
+    0b00000000, // 26
+    0b00000000, // 27
+    0b00000000, // 28
+    0b00000000, // 29
+    0b00000000, // 30
+    0b00000000, // 31
+
 };
 
 // WiFi access point configuration
@@ -293,7 +342,6 @@ static void set_configuration_parameters(void) {
         SYSTEM_NOT_CONFIGURED,
         "Timer configuration failed.");
   }
-  vTaskDelay(pdMS_TO_TICKS(2000));
   digitalWrite(GREEN_LED_PIN, LOW);
   digitalWrite(YELLOW_LED_PIN, LOW);
 }
@@ -328,7 +376,9 @@ static void configure_if_requested(void) {
     digitalWrite(BUILTIN_LED_PIN, HIGH);
     show_wifi_setup();
     set_configuration_parameters();
+    display(wait_bitmap, {31, 31, 0}, panel);
     status_display.clear();
+    vTaskDelay(pdMS_TO_TICKS(2000));
     digitalWrite(BUILTIN_LED_PIN, LOW);
     wifi_off();
     panel.clear();
@@ -572,11 +622,11 @@ void setup() {
   Serial.printf("Practice field timer compiled on %s at %s.\n",
       __DATE__, __TIME__);
 
+  init_i2c();
+
   panel.clear();
   TextDisplay text_display;
   text_display(setup_bitmap, {0, 63, 0}, panel);
-
-  init_i2c();
 
   blink_it(BUILTIN_LED_PIN);
   blink_it(RED_LED_PIN);
