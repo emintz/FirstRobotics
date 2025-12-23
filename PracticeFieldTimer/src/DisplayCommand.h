@@ -32,11 +32,10 @@
 
 struct DisplayCommand {
   enum class Pattern {
-    TEST_PATTERN = 1,
-    PLAIN_TIME = 2,
-    SLOW_BLINK_TIME = 3,
-    FAST_BLINK_TIME = 4,
-    FLOOD = 5,
+    PLAIN_TIME = 1,
+    SLOW_BLINK_TIME = 2,
+    FAST_BLINK_TIME = 3,
+    FLOOD = 4,
   };
 
   struct Color {
