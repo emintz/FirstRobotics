@@ -285,7 +285,7 @@ static void blink_it(int pin_no) {
  * configuration.
  */
 static void wifi_on(void) {
-  if (!WiFi.mode(WIFI_STA) || !WiFi.begin(ssid, password)) {
+  if (!WiFi.mode(WIFI_AP) || !WiFi.begin(ssid, password)) {
     ErrorHalt::halt_and_catch_fire(
         WIFI_ACCESS_POINT_SETUP_FAILED,
         "Could not configure WIFI as an access_point");
