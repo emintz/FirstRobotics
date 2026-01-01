@@ -7,7 +7,7 @@
  * Synchronizes the system time with network time and sets
  * the time zone to UTC.
  *
- * Copyright (C) 2025 Eric Mintz
+ * Copyright (C) 2026 Eric Mintz
  * All Rights Reserved
  *
  * This program is free software: you can redistribute it and/or modify

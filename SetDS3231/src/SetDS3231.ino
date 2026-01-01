@@ -22,6 +22,9 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Note: users MUST provide WiFiCredentials.h containing their
+ *       WiFi SSID and password. See WiFiConnection.h for details.
  */
 
 #include "Arduino.h"
@@ -37,6 +40,9 @@ static DS3231 rtc;
 static NetworkTime network_time;
 static WiFiConnection wifi_connection;
 
+/**
+ * Copies the current network time to the DS3231.
+ */
 static void set_rtc(void) {
   auto raw_current_time = std::time(NULL);
   auto current_time = std::gmtime(&raw_current_time);
