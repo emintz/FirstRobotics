@@ -31,7 +31,7 @@
 
 #define UNIVERSAL_UTC_TIMEZONE"Etc/UTC"
 #define NETWORK_TIME_SERVERS "pool.ntp.org"
-#define NTP_START_TIMEOUT_MS 2000
+#define NTP_START_TIMEOUT_MS 10000
 
 NetworkTime::NetworkTime(void) :
     running(false) {

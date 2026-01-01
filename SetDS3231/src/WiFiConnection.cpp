@@ -46,8 +46,6 @@ WiFiConnection::WiFiConnection() {
 
 bool WiFiConnection::begin(void) {
   int attempts = 0;
-  Serial.printf("WiFi credentials, ssid: %s, password: %s\n",
-      WIFI_SSID, WIFI_PASSWORD);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (!WiFi.status() != WL_CONNECTED && attempts < 10) {
     vTaskDelay(pdMS_TO_TICKS(500));

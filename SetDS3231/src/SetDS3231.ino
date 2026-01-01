@@ -25,6 +25,19 @@
  *
  * Note: users MUST provide WiFiCredentials.h containing their
  *       WiFi SSID and password. See WiFiConnection.h for details.
+ *
+ * Connect the DS3231 as follows:
+ *
+ * DS3231 Signal     GPIO Pin
+ * ----------------- -------------------------------------
+ * SCL (I2C clock)   22 (I2C SCL)
+ * SDA (I2C data)    21 (I2C SDA)
+ * SQW (1 Hz output) 34 (input-only pin)
+ *
+ * Provide +3.3 Volts to Vcc and connect GND to ground.
+ *
+ * See https://www.analog.com/media/en/technical-documentation/data-sheets/DS3231.pdf
+ * and your breakout board documentation for DS3231 signals.
  */
 
 #include "Arduino.h"
@@ -36,9 +49,24 @@
 #include <DS3231.h>
 #include <Wire.h>
 
+#define BUILTIN_LED_PIN 2
+#define SQW_IN_PIN 34
+
 static DS3231 rtc;
 static NetworkTime network_time;
 static WiFiConnection wifi_connection;
+
+/**
+ * Hangs the system and blinks an error signal.
+ */
+static void fast_blink(void) {
+  for (;;) {
+    digitalWrite(BUILTIN_LED_PIN, HIGH);
+    vTaskDelay(pdMS_TO_TICKS(50));
+    digitalWrite(BUILTIN_LED_PIN, LOW);
+    vTaskDelay(pdMS_TO_TICKS(100));
+  }
+}
 
 /**
  * Copies the current network time to the DS3231.
@@ -82,6 +110,11 @@ void setup() {
   Serial.println("Serial I/O initialized.");
   Serial.printf("SetDS3231 compiled on %s at %s.\n",
       __DATE__, __TIME__);
+
+  pinMode(BUILTIN_LED_PIN, OUTPUT);
+  digitalWrite(BUILTIN_LED_PIN, LOW);
+  pinMode(SQW_IN_PIN, INPUT);
+
   Wire.begin();
   Serial.println("I2C bus initialized.");
   bool setup_status = wifi_connection.begin();
@@ -102,8 +135,12 @@ void setup() {
 
   if (setup_status) {
     set_rtc();
+  } else {
+    fast_blink();
   }
 }
 
 void loop() {
+  digitalWrite(BUILTIN_LED_PIN, digitalRead(SQW_IN_PIN));
+  vTaskDelay(1);
 }
