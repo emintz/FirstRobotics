@@ -1,0 +1,9 @@
+/core
+/.cproject
+/libraries
+/.project
+/.settings
+/spec.d
+/.sproject
+/Release/
+/sloeber.ino.cpp
