@@ -33,7 +33,8 @@
 
 class DS3231_TimeSource : public TimeSource {
 
-  RTC_DS3231 ds3231;
+//  RTC_DS3231 ds3231;
+  DS3231 ds3231;
 
 public:
   /*

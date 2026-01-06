@@ -23,6 +23,9 @@
 
 #include "DS3231TimeSource.h"
 
+#define DS3231_CONTROL_REGISTER 0xe
+#define SQW_1_HZ_MASK 0xE1
+
 DS3231_TimeSource::DS3231_TimeSource() {
 }
 
@@ -30,11 +33,16 @@ DS3231_TimeSource::~DS3231_TimeSource() {
 }
 
 bool DS3231_TimeSource::begin(void) {
-  bool status = ds3231.begin();
-  if (status) {
-    ds3231.writeSqwPinMode(DS3231_SquareWave1Hz);
-  }
-  return status;
+  ds3231.begin();
+  uint8_t control_register = ds3231.read(DS3231_CONTROL_REGISTER);
+  Serial.printf("DS3231 control register (0xE) on read: %x.\n",
+      static_cast<int>(control_register));
+  control_register &= ~0x04; // turn off INTCON
+  control_register &= ~0x18; // set freq bits to 0
+  Serial.printf("Setting DS3231 control register to %x.\n",
+      static_cast<int>(control_register));
+  ds3231.write(DS3231_CONTROL_REGISTER, control_register);
+  return true;
 }
 
 uint64_t DS3231_TimeSource::seconds_since_midnight(void) {
