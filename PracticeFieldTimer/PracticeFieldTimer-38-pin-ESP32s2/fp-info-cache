@@ -1,4 +1,4 @@
-28296553155363662
+28305447248464564
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -71809,6 +71809,41 @@ Misc
 2MS3T1B1M2QES
 2MS3T1B1M2QES-4
 Switch
+0
+3
+3
+Misc
+DS3231_Module
+Generic 6 Pin I2C DS3231 Module
+
+0
+6
+6
+Misc
+LCD-I2C-20X4B-Breakout
+
+
+0
+4
+4
+Misc
+LED_5mm_PCBWAY
+
+
+0
+2
+2
+Misc
+MJTP1119
+MJTP1119-2
+Switch
+0
+4
+4
+Misc
+SW_500ASSP1M2QE
+
+
 0
 3
 3

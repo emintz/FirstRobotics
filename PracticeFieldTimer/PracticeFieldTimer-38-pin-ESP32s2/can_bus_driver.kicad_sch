@@ -711,7 +711,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "power:+3V3"
+		(symbol "power:+3.3V"
 			(power)
 			(pin_numbers
 				(hide yes)
@@ -732,7 +732,7 @@
 					(hide yes)
 				)
 			)
-			(property "Value" "+3V3"
+			(property "Value" "+3.3V"
 				(at 0 3.556 0)
 				(effects
 					(font
@@ -758,7 +758,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Power symbol creates a global label with name \"+3V3\""
+			(property "Description" "Power symbol creates a global label with name \"+3.3V\""
 				(at 0 0 0)
 				(effects
 					(font
@@ -776,7 +776,7 @@
 					(hide yes)
 				)
 			)
-			(symbol "+3V3_0_1"
+			(symbol "+3.3V_0_1"
 				(polyline
 					(pts
 						(xy -0.762 1.27) (xy 0 2.54)
@@ -814,7 +814,7 @@
 					)
 				)
 			)
-			(symbol "+3V3_1_1"
+			(symbol "+3.3V_1_1"
 				(pin power_in line
 					(at 0 0 90)
 					(length 0)
@@ -1112,7 +1112,7 @@
 	)
 	(wire
 		(pts
-			(xy 182.88 80.01) (xy 182.88 96.52)
+			(xy 182.88 80.01) (xy 182.88 92.71)
 		)
 		(stroke
 			(width 0)
@@ -1132,6 +1132,16 @@
 	)
 	(wire
 		(pts
+			(xy 120.65 80.01) (xy 124.46 80.01)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f1616f85-3302-497c-a895-6d002425a076")
+	)
+	(wire
+		(pts
 			(xy 102.87 92.71) (xy 102.87 102.87)
 		)
 		(stroke
@@ -1139,28 +1149,6 @@
 			(type default)
 		)
 		(uuid "f1b3ac6b-395c-47e2-a1b1-d7d80e4b76ed")
-	)
-	(global_label "CAN TX"
-		(shape output)
-		(at 124.46 80.01 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "9fb6306a-2566-42de-a4c6-3e1e9ecd864c")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 114.641 80.01 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-				(hide yes)
-			)
-		)
 	)
 	(global_label "CANL"
 		(shape bidirectional)
@@ -1180,6 +1168,28 @@
 					(size 1.27 1.27)
 				)
 				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "CAN RX"
+		(shape output)
+		(at 124.46 87.63 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "c189b14f-d315-498e-840a-f9942210e2bc")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 114.3386 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
 				(hide yes)
 			)
 		)
@@ -1206,9 +1216,9 @@
 			)
 		)
 	)
-	(global_label "CAN RX"
+	(global_label "CAN TX"
 		(shape input)
-		(at 124.46 87.63 180)
+		(at 120.65 80.01 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -1216,9 +1226,9 @@
 			)
 			(justify right)
 		)
-		(uuid "ee05816a-4997-49eb-9cb5-a80c5f91659a")
+		(uuid "e9e3d551-7a9e-4f2f-8eb1-30fee5e88342")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 114.3386 87.63 0)
+			(at 110.831 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1230,16 +1240,16 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 182.88 104.14 0)
+		(at 111.76 102.87 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "29692924-e202-49e7-a569-4d0c6fb59b0b")
-		(property "Reference" "#PWR011"
-			(at 182.88 110.49 0)
+		(uuid "10aaf2ea-e882-4159-87d9-e953f6f7920c")
+		(property "Reference" "#PWR0101"
+			(at 111.76 109.22 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1248,7 +1258,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 182.88 109.22 0)
+			(at 111.76 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1256,7 +1266,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 182.88 104.14 0)
+			(at 111.76 102.87 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1265,7 +1275,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 182.88 104.14 0)
+			(at 111.76 102.87 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1274,7 +1284,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 182.88 104.14 0)
+			(at 111.76 102.87 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1283,12 +1293,94 @@
 			)
 		)
 		(pin "1"
-			(uuid "966dbb46-d5d9-4791-a378-0859d308ee02")
+			(uuid "dc9a35c1-3119-4835-8a42-f1a460d8335b")
 		)
 		(instances
-			(project ""
+			(project "can_bus_driver"
+				(path "/218fd151-998d-4eaa-aeb6-282c89bd378f"
+					(reference "#PWR03")
+					(unit 1)
+				)
+			)
+			(project "PracticeFieldTimer-38-pin-ESP32s2"
 				(path "/845ef731-c8e5-4e97-892b-a237541c6d77/c59ecbc7-edb5-417c-b0b4-a62a3517c5c8"
-					(reference "#PWR011")
+					(reference "#PWR0101")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 182.88 96.52 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "1e8fd135-8c76-411f-80be-1058136cc2ff")
+		(property "Reference" "R1"
+			(at 185.42 95.2499 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "10K"
+			(at 185.42 97.7899 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P15.24mm_Horizontal"
+			(at 181.102 96.52 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 182.88 96.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 182.88 96.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "773fa12a-696d-4833-9269-87b24eb851ce")
+		)
+		(pin "1"
+			(uuid "2c3109ae-1d8d-41cc-9811-aa5788fb77b6")
+		)
+		(instances
+			(project "can_bus_driver"
+				(path "/218fd151-998d-4eaa-aeb6-282c89bd378f"
+					(reference "R8")
+					(unit 1)
+				)
+			)
+			(project "PracticeFieldTimer-38-pin-ESP32s2"
+				(path "/845ef731-c8e5-4e97-892b-a237541c6d77/c59ecbc7-edb5-417c-b0b4-a62a3517c5c8"
+					(reference "R1")
 					(unit 1)
 				)
 			)
@@ -1322,7 +1414,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0414_L11.9mm_D4.5mm_P5.08mm_Vertical"
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P15.24mm_Horizontal"
 			(at 200.152 88.9 90)
 			(effects
 				(font
@@ -1356,6 +1448,12 @@
 			(uuid "6d9b9051-2e90-4b41-8241-aa8a14069123")
 		)
 		(instances
+			(project "can_bus_driver"
+				(path "/218fd151-998d-4eaa-aeb6-282c89bd378f"
+					(reference "R7")
+					(unit 1)
+				)
+			)
 			(project "PracticeFieldTimer-38-pin-ESP32s2"
 				(path "/845ef731-c8e5-4e97-892b-a237541c6d77/c59ecbc7-edb5-417c-b0b4-a62a3517c5c8"
 					(reference "R2")
@@ -1374,7 +1472,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "33a98125-a380-4b9a-b87b-464bf41b0996")
-		(property "Reference" "J2"
+		(property "Reference" "J8"
 			(at 215.9 79.248 0)
 			(effects
 				(font
@@ -1382,7 +1480,7 @@
 				)
 			)
 		)
-		(property "Value" "/CAN Enable"
+		(property "Value" "CAN Terminate"
 			(at 215.9 81.788 0)
 			(effects
 				(font
@@ -1424,16 +1522,22 @@
 			(uuid "93a8af0f-dea7-4997-b48b-23188f11ab1a")
 		)
 		(instances
+			(project "can_bus_driver"
+				(path "/218fd151-998d-4eaa-aeb6-282c89bd378f"
+					(reference "J8")
+					(unit 1)
+				)
+			)
 			(project "PracticeFieldTimer-38-pin-ESP32s2"
 				(path "/845ef731-c8e5-4e97-892b-a237541c6d77/c59ecbc7-edb5-417c-b0b4-a62a3517c5c8"
-					(reference "J2")
+					(reference "J8")
 					(unit 1)
 				)
 			)
 		)
 	)
 	(symbol
-		(lib_id "power:+3V3")
+		(lib_id "power:+3.3V")
 		(at 102.87 69.85 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -1441,8 +1545,8 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "4ad9059b-2cf5-4c03-9b9d-f95b8f83c73e")
-		(property "Reference" "#PWR012"
+		(uuid "48c085c6-de3c-4d20-a4f3-3b7567c83ce3")
+		(property "Reference" "#PWR0104"
 			(at 102.87 73.66 0)
 			(effects
 				(font
@@ -1451,7 +1555,7 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+3V3"
+		(property "Value" "+3.3V"
 			(at 102.87 64.77 0)
 			(effects
 				(font
@@ -1477,7 +1581,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+3V3\""
+		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
 			(at 102.87 69.85 0)
 			(effects
 				(font
@@ -1487,82 +1591,18 @@
 			)
 		)
 		(pin "1"
-			(uuid "3985dc11-fdd6-4493-9489-ba98833a4281")
+			(uuid "f33f9e5d-4f8c-425f-9334-6bdc726de276")
 		)
 		(instances
 			(project ""
-				(path "/845ef731-c8e5-4e97-892b-a237541c6d77/c59ecbc7-edb5-417c-b0b4-a62a3517c5c8"
-					(reference "#PWR012")
+				(path "/218fd151-998d-4eaa-aeb6-282c89bd378f"
+					(reference "#PWR01")
 					(unit 1)
 				)
 			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 182.88 100.33 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "6dcda1af-7a59-445b-928b-314f88361e95")
-		(property "Reference" "R1"
-			(at 185.42 99.0599 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "10K"
-			(at 185.42 101.5999 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_THT:R_Axial_DIN0414_L11.9mm_D4.5mm_P5.08mm_Vertical"
-			(at 181.102 100.33 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 182.88 100.33 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Resistor"
-			(at 182.88 100.33 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "6bbce004-d897-43e7-b0ec-6f56a53aed5a")
-		)
-		(pin "1"
-			(uuid "8643a631-1cd2-4506-bd7d-ce71f4ec5eb2")
-		)
-		(instances
-			(project ""
+			(project "PracticeFieldTimer-38-pin-ESP32s2"
 				(path "/845ef731-c8e5-4e97-892b-a237541c6d77/c59ecbc7-edb5-417c-b0b4-a62a3517c5c8"
-					(reference "R1")
+					(reference "#PWR0104")
 					(unit 1)
 				)
 			)
@@ -1630,6 +1670,12 @@
 			(uuid "2839bba2-75a8-4495-9691-a6349caf1a44")
 		)
 		(instances
+			(project "can_bus_driver"
+				(path "/218fd151-998d-4eaa-aeb6-282c89bd378f"
+					(reference "C1")
+					(unit 1)
+				)
+			)
 			(project ""
 				(path "/845ef731-c8e5-4e97-892b-a237541c6d77/c59ecbc7-edb5-417c-b0b4-a62a3517c5c8"
 					(reference "C1")
@@ -1664,7 +1710,7 @@
 				)
 			)
 		)
-		(property "Footprint" "D8"
+		(property "Footprint" "Package_SO:SOIC-8-1EP_3.9x4.9mm_P1.27mm_EP2.514x3.2mm"
 			(at 124.46 80.01 0)
 			(effects
 				(font
@@ -1718,6 +1764,12 @@
 			(uuid "d12f9d18-d94b-41e5-ad56-afadf2e9b808")
 		)
 		(instances
+			(project "can_bus_driver"
+				(path "/218fd151-998d-4eaa-aeb6-282c89bd378f"
+					(reference "U2")
+					(unit 1)
+				)
+			)
 			(project ""
 				(path "/845ef731-c8e5-4e97-892b-a237541c6d77/c59ecbc7-edb5-417c-b0b4-a62a3517c5c8"
 					(reference "U2")
@@ -1735,8 +1787,8 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "c7c92c0b-bbf2-43f0-8dd8-3da291bdc714")
-		(property "Reference" "#PWR013"
+		(uuid "b5e4a351-3c15-4bd4-bd95-c59b119f91be")
+		(property "Reference" "#PWR0102"
 			(at 102.87 109.22 0)
 			(effects
 				(font
@@ -1781,12 +1833,18 @@
 			)
 		)
 		(pin "1"
-			(uuid "1c247d3a-49fb-4c01-91e7-88095e76c60e")
+			(uuid "a1a16fc1-a37f-4560-89df-72aa640f880d")
 		)
 		(instances
-			(project ""
+			(project "can_bus_driver"
+				(path "/218fd151-998d-4eaa-aeb6-282c89bd378f"
+					(reference "#PWR02")
+					(unit 1)
+				)
+			)
+			(project "PracticeFieldTimer-38-pin-ESP32s2"
 				(path "/845ef731-c8e5-4e97-892b-a237541c6d77/c59ecbc7-edb5-417c-b0b4-a62a3517c5c8"
-					(reference "#PWR013")
+					(reference "#PWR0102")
 					(unit 1)
 				)
 			)
@@ -1794,16 +1852,16 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 111.76 102.87 0)
+		(at 182.88 100.33 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "ff0c83c6-dfb2-4613-94a6-578f7b734e88")
-		(property "Reference" "#PWR08"
-			(at 111.76 109.22 0)
+		(uuid "fdd76f4b-17c9-4b15-af35-3633b032d7ff")
+		(property "Reference" "#PWR0103"
+			(at 182.88 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1812,7 +1870,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 111.76 107.95 0)
+			(at 182.88 105.41 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1820,7 +1878,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 111.76 102.87 0)
+			(at 182.88 100.33 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1829,7 +1887,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 111.76 102.87 0)
+			(at 182.88 100.33 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1838,7 +1896,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 111.76 102.87 0)
+			(at 182.88 100.33 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1847,15 +1905,27 @@
 			)
 		)
 		(pin "1"
-			(uuid "38c42755-dd98-46ce-8864-d072ef75c8e7")
+			(uuid "0f177ee0-9f23-4c64-a178-cace8ea1f4ee")
 		)
 		(instances
+			(project "can_bus_driver"
+				(path "/218fd151-998d-4eaa-aeb6-282c89bd378f"
+					(reference "#PWR04")
+					(unit 1)
+				)
+			)
 			(project "PracticeFieldTimer-38-pin-ESP32s2"
 				(path "/845ef731-c8e5-4e97-892b-a237541c6d77/c59ecbc7-edb5-417c-b0b4-a62a3517c5c8"
-					(reference "#PWR08")
+					(reference "#PWR0103")
 					(unit 1)
 				)
 			)
 		)
 	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
 )
