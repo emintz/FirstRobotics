@@ -423,7 +423,7 @@ static void read_eeprom(
 }
 
 /*
- * Load the configuration from NVS.
+ * Load the configuration from non-volatile storage (NVS).
  */
 static void load_configuration(void) {
   Serial.println("Loading configuration.");
@@ -514,6 +514,10 @@ void start_manual_countdown(void) {
 /*
  * Count the continuous countdown if the system is configured
  * to run continuously, i.e. if MANUAL_ENABLE_NOT_PIN is HIGH.
+ * Note that the caller must ensure that FOLLOWER_NOT_PIN is
+ * HIGH before invoking this function. Since the to MUST be
+ * connected by a SPDT ON-OFF-ON switch, the harware should
+ * enforce this.
  */
 static void maybe_start_continuous_countdown(void) {
   if (digitalRead(MANUAL_ENABLE_NOT_PIN) == HIGH) {
@@ -657,6 +661,11 @@ void setup() {
 
   vTaskDelay(pdMS_TO_TICKS(2000));
 
+  /*
+   * Note: FOLLOW_NOT_PIN and MANUAL_ENABLE_NOT_PIN MUST be wired
+   * to the opposite side of a SPDT ON-OFF-ON switch wired to
+   * ground, so at most one of them can be LOW.
+   */
   if (digitalRead(FOLLOWER_NOT_PIN) == HIGH) {
     Serial.println("Configured as leader, starting countdown.");
     maybe_start_continuous_countdown();
