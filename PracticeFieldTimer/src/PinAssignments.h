@@ -26,25 +26,97 @@
 #ifndef PINASSIGNMENTS_H_
 #define PINASSIGNMENTS_H_
 
+/**
+ * @brief GPIO pin assignments
+ *
+ * Specifies GPIO pin function. Default pin assignments are
+ * honored as closely as possible.
+ *
+ * Note that pins may interact. For example, when manual
+ * countdown is enabled, follower most must be disabled.
+ * Hardware MUST enforce such conditions. The
+ * manual mode/follower mode exclusion is enforced by
+ * a cheap and cheerful single pole double through
+ * ON-OFF-ON switch.
+ */
+
+/**
+ * Built-in LED on the ESP32 board
+ */
 #define BUILTIN_LED_PIN 2
 
+/**
+ * Holding this pin LOW on boot brings up a web server
+ * that lets users configure the timer. Press to start
+ * the countdown when in manual mode.
+ */
 #define SET_CONFIGURATION_PIN 4
 
+/**
+ * Status indicator LEDs
+ */
 #define RED_LED_PIN 12
 #define GREEN_LED_PIN 13
 #define YELLOW_LED_PIN 14
 
+/**
+ * Outputs data to the WS2812B LED panel. Connect to
+ * the panel's DIN wire.
+ */
 #define LED_ARRAY_PIN 15
 
+/**
+ * I2C bus pins. SCL carries the clock and SDA carries
+ * data. The I2C bus manages time from the DS3231 and
+ * the 20 x 4 LCD display.
+ */
 #define I2C_SCL_PIN 22
 #define I2C_SDA_PIN 21
 
+/**
+ * Puts the timer in follower mode when LOW. When
+ * following, the timer displays times as directed
+ * by incoming Controller Area Network (CAN)
+ * messages. Note that the MANUAL ENABLE pin
+ * must be HIGH when the FOLLOWER pin is LOW.
+ * The hardware must enforce this.
+ */
 #define FOLLOWER_NOT_PIN 25
+
+/**
+ * Disables the Controller Area Network (CAN) bus
+ * when LOW. This is used when the timer is running
+ * stand-alone (i.e. not connected to other timers).
+ */
 #define CAN_ENABLE_NOT_PIN 26
+
+/**
+ * Puts the timer in manual mode when LOW. When
+ * in manual mode, the timer starts when the
+ * configure pin, SET_CONFIGURATION_PIN, goes
+ * LOW. Note that the follower pin,
+ * FOLLOWER_NOT_PIN, must be HIGH when this
+ * pin is LOW. The hardware must enforce
+ * this.
+ */
 #define MANUAL_ENABLE_NOT_PIN 27
 
+/**
+ * Provides incoming messages from the Controller
+ * Area Network (CAN) bus.
+ */
 #define CAN_RECEIVE_PIN 32
+
+/**
+ * Carries messages for transmission on the
+ * Controller Area Network (CAN) bus.
+ */
 #define CAN_TRANSMIT_PIN 33
+
+/**
+ * Receives a 1 Hz square wave pin from the attached
+ * DS3231 time source.
+ */
 #define SQUARE_WAVE_PIN 34
 
 #endif /* PINASSIGNMENTS_H_ */
