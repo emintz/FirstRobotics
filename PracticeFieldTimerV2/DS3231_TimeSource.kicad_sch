@@ -1,0 +1,15 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "c4b384d5-3e16-403c-94a3-e12b368b31aa")
+	(paper "USLetter")
+	(title_block
+		(title "Practice Field Timer V2 (surface mount)")
+		(rev "2.0 Alpha")
+		(company "Metuchen Momentum LLC, FRC Team 7587")
+		(comment 1 "Not Licenced, License TK")
+		(comment 2 "All Rights Reserved")
+	)
+	(lib_symbols)
+)
