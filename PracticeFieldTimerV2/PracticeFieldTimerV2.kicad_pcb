@@ -2241,9 +2241,8 @@
 		(descr "C, Disc series, Radial, pin pitch=5.00mm, diameter*width=5*2.5mm^2, Capacitor, http://cdn-reichelt.de/documents/datenblatt/B300/DS_KERKO_TC.pdf")
 		(tags "C Disc series Radial pin pitch 5.00mm diameter 5mm width 2.5mm Capacitor")
 		(property "Reference" "C2"
-			(at 2.343595 -2.91 0)
+			(at 2.695 2.56 0)
 			(layer "F.SilkS")
-			(hide yes)
 			(uuid "8d1e6615-7a34-4058-8eb8-65bc87c68c71")
 			(effects
 				(font
@@ -2255,6 +2254,7 @@
 		(property "Value" "100n"
 			(at 2.5 2.5 0)
 			(layer "F.Fab")
+			(hide yes)
 			(uuid "a3e9d108-ae73-4f9f-ba6a-675ab77cf9ea")
 			(effects
 				(font
@@ -2487,7 +2487,7 @@
 		(descr "Through hole straight pin header, 1x02, 2.54mm pitch, single row")
 		(tags "Through hole pin header THT 1x02 2.54mm single row")
 		(property "Reference" "J5"
-			(at 0.1 -2.4 90)
+			(at 0.11 -2.861405 90)
 			(layer "F.SilkS")
 			(uuid "64ce1ade-37e2-4ceb-ba50-d32a9fd7df93")
 			(effects
@@ -2712,7 +2712,7 @@
 		(descr "Resistor, Axial_DIN0207 series, Axial, Horizontal, pin pitch=15.24mm, 0.25W = 1/4W, length*diameter=6.3*2.5mm^2, http://cdn-reichelt.de/documents/datenblatt/B400/1_4W%23YAG.pdf")
 		(tags "Resistor Axial_DIN0207 series Axial Horizontal pin pitch 15.24mm 0.25W = 1/4W length 6.3mm diameter 2.5mm")
 		(property "Reference" "R7"
-			(at -2.16 0.135 0)
+			(at 7.715 -2.68 0)
 			(layer "F.SilkS")
 			(uuid "3f0c3ff4-d145-4d82-be49-68460fa8e18b")
 			(effects
@@ -3062,7 +3062,7 @@
 		(descr "terminal block MaiXu MX126-5.0-03P, 3 pins, pitch 5mm, size 15.5x7.8mm, drill diameter 1.3mm, pad diameter 2.8mm, https://www.lcsc.com/datasheet/lcsc_datasheet_2309150913_MAX-MX126-5-0-03P-GN01-Cu-S-A_C5188435.pdf, script-generated using https://gitlab.com/kicad/libraries/kicad-footprint-generator/-/tree/master/scripts/TerminalBlock_MaiXu")
 		(tags "THT terminal block MaiXu MX126-5.0-03P pitch 5mm size 15.5x7.8mm drill 1.3mm pad 2.8mm")
 		(property "Reference" "J3"
-			(at 5.55 -6.3675 90)
+			(at 5.6 -5.2675 90)
 			(layer "F.SilkS")
 			(uuid "ff0a893e-1dca-4645-b913-d006104e1df0")
 			(effects
@@ -4127,7 +4127,7 @@
 		(descr "MTJ-88TX1-FSD-LG-6")
 		(tags "Connector")
 		(property "Reference" "J6"
-			(at 4.445 6.475 0)
+			(at 4.433595 19.762037 0)
 			(layer "F.SilkS")
 			(uuid "4f11a4e8-392f-443f-b9f0-98ea921e644b")
 			(effects
@@ -5642,7 +5642,7 @@
 		(descr "terminal block MaiXu MX126-5.0-07P, 7 pins, pitch 5mm, size 35.5x7.8mm, drill diameter 1.3mm, pad diameter 2.8mm, https://www.lcsc.com/datasheet/lcsc_datasheet_2309150913_MAX-MX126-5-0-03P-GN01-Cu-S-A_C5188435.pdf, script-generated using https://gitlab.com/kicad/libraries/kicad-footprint-generator/-/tree/master/scripts/TerminalBlock_MaiXu")
 		(tags "THT terminal block MaiXu MX126-5.0-07P pitch 5mm size 35.5x7.8mm drill 1.3mm pad 2.8mm")
 		(property "Reference" "J1"
-			(at 14.75 -5.12 0)
+			(at 14.75 -5.457963 0)
 			(layer "F.SilkS")
 			(uuid "497bf4e8-992d-479e-9408-24a9a264ee61")
 			(effects
@@ -6412,7 +6412,7 @@
 		(descr "MTJ-88TX1-FSD-LG-6")
 		(tags "Connector")
 		(property "Reference" "J7"
-			(at 4.445 6.475 0)
+			(at 4.428595 19.842037 0)
 			(layer "F.SilkS")
 			(uuid "49ff3cd8-f1da-441f-add8-209c1f8621b5")
 			(effects
@@ -7137,7 +7137,7 @@
 		(uuid "a05106c4-d713-4dc7-95cc-b1332520c083")
 		(at 128.33 50.74 180)
 		(property "Reference" "RV1"
-			(at 0.17 -6.3 0)
+			(at 0.28 6.12 0)
 			(layer "F.SilkS")
 			(uuid "f218da86-c3c1-44ff-ab4d-0257035bfcba")
 			(effects
@@ -9255,7 +9255,7 @@
 		(descr "C, Disc series, Radial, pin pitch=5.00mm, diameter*width=5*2.5mm^2, Capacitor, http://cdn-reichelt.de/documents/datenblatt/B300/DS_KERKO_TC.pdf")
 		(tags "C Disc series Radial pin pitch 5.00mm diameter 5mm width 2.5mm Capacitor")
 		(property "Reference" "C1"
-			(at 2.5 -2.5 0)
+			(at 2.462088 2.667963 0)
 			(layer "F.SilkS")
 			(uuid "250bb2db-f012-411a-914e-d3bcd05a4a6f")
 			(effects
@@ -11192,7 +11192,8 @@
 		(uuid "c1ac5016-5560-4624-8317-aebb703da290")
 	)
 	(gr_text "Reset"
-		(at 48.572088 123.597963 0)
+		(locked yes)
+		(at 48.91 124.78 0)
 		(layer "F.SilkS")
 		(uuid "2adb049a-efa3-47c4-8c23-b03b026c870f")
 		(effects
@@ -11203,7 +11204,8 @@
 		)
 	)
 	(gr_text "Copyright 2026\nMetuchen Momentum, LLC"
-		(at 78.9 147.19 0)
+		(locked yes)
+		(at 67.4 164.68 0)
 		(layer "F.SilkS")
 		(uuid "397af12f-c5dd-406a-a6f6-3788eece9359")
 		(effects
@@ -11214,7 +11216,8 @@
 		)
 	)
 	(gr_text "Start/Config\n"
-		(at 136.472088 123.497963 0)
+		(locked yes)
+		(at 136.44 124.34 0)
 		(layer "F.SilkS")
 		(uuid "4e3ea816-89c8-49a6-8380-1f79999006f6")
 		(effects
@@ -11225,6 +11228,7 @@
 		)
 	)
 	(gr_text "Red"
+		(locked yes)
 		(at 103.222088 123.497963 0)
 		(layer "F.SilkS")
 		(uuid "5b9c7dd5-342f-42e6-bc36-cadd53f6c519")
@@ -11236,6 +11240,7 @@
 		)
 	)
 	(gr_text "Yellow"
+		(locked yes)
 		(at 111.522088 123.597963 0)
 		(layer "F.SilkS")
 		(uuid "7466f547-c759-4d23-a201-f2e0572941c4")
@@ -11247,6 +11252,7 @@
 		)
 	)
 	(gr_text "Follow"
+		(locked yes)
 		(at 143.72 38.202037 90)
 		(layer "F.SilkS")
 		(uuid "98aaf173-852e-46d7-9854-2e70a4d8446a")
@@ -11258,6 +11264,7 @@
 		)
 	)
 	(gr_text "Green"
+		(locked yes)
 		(at 119.822088 123.497963 0)
 		(layer "F.SilkS")
 		(uuid "c0897c60-7d8e-49ea-97ba-b5b76714a3b1")
@@ -11269,6 +11276,7 @@
 		)
 	)
 	(gr_text "Auto"
+		(locked yes)
 		(at 136.8 41.7 0)
 		(layer "F.SilkS")
 		(uuid "d1637da3-7f16-44f7-99ba-da246bce6d14")
@@ -11280,6 +11288,7 @@
 		)
 	)
 	(gr_text "Manual"
+		(locked yes)
 		(at 130.12 38.102037 90)
 		(layer "F.SilkS")
 		(uuid "ddee8973-c5c0-4b45-9bd6-1384665a3237")
