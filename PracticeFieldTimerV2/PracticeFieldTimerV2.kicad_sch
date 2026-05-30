@@ -9249,6 +9249,48 @@
 		)
 	)
 	(sheet
+		(at 16.51 87.63)
+		(size 18.415 10.16)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "11c98f2b-89f7-4add-8042-04d6293d5f07")
+		(property "Sheetname" "Time Keeper"
+			(at 16.51 86.9184 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "Time_Keeper.kicad_sch"
+			(at 16.51 98.3746 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "PracticeFieldTimerV2"
+				(path "/a82ebad5-0442-461b-8944-6652da9a0796"
+					(page "4")
+				)
+			)
+		)
+	)
+	(sheet
 		(at 16.51 63.5)
 		(size 12.7 5.08)
 		(exclude_from_sim no)
