@@ -60,6 +60,15 @@
 #define YELLOW_LED_PIN 14
 
 /**
+ * Traffic indicator LEDs on the RJ45 jacks. Note that the board
+ * has two: jack A and jack B.
+ */
+#define RJ45_A_Yellow 16
+#define RJ45_A_Green 17
+#define RJ45_B_Yellow 18
+#define RJ45-B_Green 19
+
+/**
  * Outputs data to the WS2812B LED panel. Connect to
  * the panel's DIN wire.
  */
