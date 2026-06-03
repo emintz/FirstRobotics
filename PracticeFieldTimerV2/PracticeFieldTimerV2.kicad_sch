@@ -10183,8 +10183,8 @@
 		)
 	)
 	(sheet
-		(at 16.51 87.63)
-		(size 12.7 5.08)
+		(at 16.51 86.36)
+		(size 12.7 5.715)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
@@ -10199,7 +10199,7 @@
 		)
 		(uuid "11c98f2b-89f7-4add-8042-04d6293d5f07")
 		(property "Sheetname" "Time Keeper"
-			(at 16.51 86.9184 0)
+			(at 16.51 85.6484 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10208,7 +10208,7 @@
 			)
 		)
 		(property "Sheetfile" "Time_Keeper.kicad_sch"
-			(at 16.51 93.2946 0)
+			(at 16.51 92.6596 0)
 			(effects
 				(font
 					(size 1.27 1.27)
