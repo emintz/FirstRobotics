@@ -151,6 +151,130 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Device:R"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "R"
+				(at 2.032 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "R"
+				(at 0 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at -1.778 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Resistor"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "R res resistor"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "R_*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "R_0_1"
+				(rectangle
+					(start -1.016 -2.54)
+					(end 1.016 2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "R_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 1.27)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 1.27)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Misc:1074"
 			(pin_names
 				(offset 1.016)
@@ -1014,6 +1138,12 @@
 		(color 0 0 0 0)
 		(uuid "1908c48a-705c-4731-8b6c-fdcc16d71d23")
 	)
+	(junction
+		(at 152.4 78.74)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "c18e7b09-2209-49e1-9366-6b30bb065426")
+	)
 	(no_connect
 		(at 109.22 83.82)
 		(uuid "06bd4a28-b426-4adc-b50a-b68866dd2859")
@@ -1021,6 +1151,16 @@
 	(no_connect
 		(at 144.78 76.2)
 		(uuid "90f69f87-0874-4e18-b7ac-2b6164b72e80")
+	)
+	(wire
+		(pts
+			(xy 144.78 71.12) (xy 166.37 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "19bd1ccb-bdf6-4dd0-8a7c-bd2001070541")
 	)
 	(wire
 		(pts
@@ -1074,7 +1214,17 @@
 	)
 	(wire
 		(pts
-			(xy 144.78 78.74) (xy 151.13 78.74)
+			(xy 152.4 63.5) (xy 152.4 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "78a435f2-a5c2-4daf-b909-0459fb54c323")
+	)
+	(wire
+		(pts
+			(xy 144.78 78.74) (xy 152.4 78.74)
 		)
 		(stroke
 			(width 0)
@@ -1084,13 +1234,13 @@
 	)
 	(wire
 		(pts
-			(xy 144.78 71.12) (xy 166.37 71.12)
+			(xy 152.4 78.74) (xy 156.21 78.74)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "83c6e7a9-989c-4037-a0dc-756255709a03")
+		(uuid "8d0969a6-cec1-4310-8884-8c8fa19754da")
 	)
 	(wire
 		(pts
@@ -1166,7 +1316,7 @@
 	)
 	(global_label "SQW"
 		(shape output)
-		(at 151.13 78.74 0)
+		(at 156.21 78.74 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -1176,7 +1326,7 @@
 		)
 		(uuid "d03f0847-6392-40b1-8db3-d8a849960581")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 158.1066 78.74 0)
+			(at 163.1866 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1759,6 +1909,76 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:R")
+		(at 152.4 59.69 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "954914f2-caa0-4b9d-9daa-eb95f5a392d7")
+		(property "Reference" "R12"
+			(at 154.94 58.4199 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "10k"
+			(at 154.94 60.9599 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P15.24mm_Horizontal"
+			(at 150.622 59.69 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 152.4 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 152.4 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "3b9e01ec-e37d-4e30-a7e5-be49a6369568")
+		)
+		(pin "1"
+			(uuid "122ed14b-8a47-4f9d-9932-ca213a60400f")
+		)
+		(instances
+			(project ""
+				(path "/a82ebad5-0442-461b-8944-6652da9a0796/11c98f2b-89f7-4add-8042-04d6293d5f07"
+					(reference "R12")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:+3.3V")
 		(at 144.78 55.88 0)
 		(unit 1)
@@ -1885,6 +2105,72 @@
 			(project "PracticeFieldTimerV2"
 				(path "/a82ebad5-0442-461b-8944-6652da9a0796/11c98f2b-89f7-4add-8042-04d6293d5f07"
 					(reference "#PWR027")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3.3V")
+		(at 152.4 55.88 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "e646e86b-6ed1-4356-9684-944e2a2257d4")
+		(property "Reference" "#PWR012"
+			(at 152.4 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3.3V"
+			(at 152.4 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 152.4 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 152.4 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+			(at 152.4 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "5443cb70-9183-4c3b-ba1f-0bf03c21a306")
+		)
+		(instances
+			(project "PracticeFieldTimerV2"
+				(path "/a82ebad5-0442-461b-8944-6652da9a0796/11c98f2b-89f7-4add-8042-04d6293d5f07"
+					(reference "#PWR012")
 					(unit 1)
 				)
 			)
