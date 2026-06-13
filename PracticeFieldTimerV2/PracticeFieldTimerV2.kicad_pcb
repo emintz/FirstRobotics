@@ -9059,7 +9059,7 @@
 		(layer "F.Cu")
 		(uuid "c419160d-e843-46ce-9afa-e700a5641e66")
 		(at 137.54 119.79)
-		(property "Reference" ""
+		(property "Reference" "MH3"
 			(at 0 0 0)
 			(layer "F.SilkS")
 			(hide yes)
