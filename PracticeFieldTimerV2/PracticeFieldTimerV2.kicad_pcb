@@ -12336,7 +12336,7 @@
 		)
 	)
 	(gr_text "Manual"
-		(at 129.63 78.81 0)
+		(at 129.62 80.19 0)
 		(layer "F.SilkS")
 		(uuid "4772b1ff-5cfc-4425-b690-e03a1a1f721c")
 		(effects
@@ -12444,6 +12444,18 @@
 				(size 1 1)
 				(thickness 0.15)
 			)
+		)
+	)
+	(gr_text "Version 1.0.0\n14-Jun-2026"
+		(at 51.07 105.4 0)
+		(layer "F.SilkS")
+		(uuid "83b02552-ea61-4a4f-9e93-42b50a469b4a")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
 		)
 	)
 	(gr_text "3v3"
