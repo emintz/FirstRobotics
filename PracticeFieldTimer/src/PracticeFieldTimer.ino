@@ -56,6 +56,8 @@
 #include <WiFi.h>
 #include <Wire.h>
 
+#include <hal/efuse_hal.h>
+
 // Status LCD configuration
 #define LCD_ADDRESS 0x27
 #define LCD_COLUMNS 20
@@ -260,16 +262,79 @@ static CanBus can_bus(CAN_RECEIVE_PIN, CAN_TRANSMIT_PIN, CanBusSpeed::BPS_100K);
 static CANDisplayCommandPublisher to_can_bus(can_bus);
 static WebServer web_server;
 
+/**
+ * Prints chip characteristics -- helpful for debugging.
+ */
+static void show_machine_characteristics(void) {
+  uint8_t mac_address[8];
+  memset(mac_address, 0, sizeof(mac_address));
+  Serial.printf(
+      "Chip version: %u.\n", efuse_hal_chip_revision());
+  Serial.printf(
+      "Block version: %u.\n", efuse_hal_blk_version());
+  Serial.printf(
+      "ESP32 model: %s.\n", ESP.getChipModel());
+  Serial.printf(
+      "The chip has %u cores.\n", ESP.getChipCores());
+  efuse_hal_get_mac(mac_address);
+  Serial.printf(
+      "MAC address: %02x:%02x:%02x:%02x:%02x:%02x.\n",
+      mac_address[0],
+      mac_address[1],
+      mac_address[2],
+      mac_address[3],
+      mac_address[4],
+      mac_address[5]);
+}
+
+/**
+ * Query the I2C bus for a device at the specified address on Wire
+ * (bus 0).
+ *
+ * Parameters:
+ * ----------
+ *
+ * Name                 Contents
+ * -----------------    ------------------------------------------------
+ * address              I2C address to probe
+ *
+ * Returns: true if an I2C device responds, false otherwise
+ */
+static bool have_i2c_device(uint8_t address) {
+  Wire.beginTransmission(address);
+  auto error = Wire.endTransmission();
+  if (error == 4) {
+    Serial.printf("Unknown error at 0x%2x(%d)\n",
+        address, address);
+  }
+  return !error;
+}
+
+/**
+ * Sense all attached I2C devices. The method probes the
+ * bus at all valid addresses.
+ */
+static void scan_i2c_bus(void) {
+  Serial.println("Scanning I2C bus...");
+  for (uint8_t address = 1; address < 127; address++) {
+    if (have_i2c_device(address)) {
+      Serial.printf("I2C device found at: 0x%02x (%d decimal).\n",
+          static_cast<int>(address), static_cast<int>(address));
+    }
+  }
+  Serial.println("I2C bus scan completed.");
+}
+
 /*
  * Raises and lowers a GPIO pin 4 times/second for one second.
  * This is used during startup.
-   *
-   * Parameters:
-   * ----------
-   *
-   * Name                 Contents
-   * -----------------    ------------------------------------------------
-   * pin                  GPIO pin to blink.
+ *
+ * Parameters:
+ * ----------
+ *
+ * Name                 Contents
+ * -----------------    ------------------------------------------------
+ * pin                  GPIO pin to blink.
  */
 static void blink_it(int pin_no) {
   for (int i = 0; i < 4; ++i) {
@@ -565,6 +630,7 @@ static void init_i2c(void) {
         I2C_STARTUP_FAILED,
         "I2C bus initialization failed.");
   }
+  scan_i2c_bus();
   lcd.init();
   lcd.backlight();
   status_display.health("Setup");
@@ -624,6 +690,8 @@ void setup() {
   Serial.println("Serial I/O initialized.");
   Serial.printf("Practice field timer compiled on %s at %s.\n",
       __DATE__, __TIME__);
+
+  show_machine_characteristics();
 
   init_i2c();
 
