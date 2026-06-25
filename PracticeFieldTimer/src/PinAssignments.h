@@ -114,7 +114,7 @@
  * Provides incoming messages from the Controller
  * Area Network (CAN) bus.
  */
-#define CAN_RECEIVE_PIN 32
+#define CAN_RECEIVE_PIN 35
 
 /**
  * Carries messages for transmission on the
