@@ -54,13 +54,16 @@ public:
    *                      blinks annoyingly.
    * command_queue        Carries display commands to the panel server.
    * command_publisher    Publishes the command to the CAN bus if the
+   * rj45_led_blink       Carries commands to blink the RJ45 socket
+   *                      LEDs.
    */
   OneShotCountdown(
       uint8_t sqw_pin,
       int16_t duration_in_seconds,
       int16_t end_phase_seconds,
       PullQueueHT<DisplayCommand>& command_queue,
-      DisplayCommandPublisher& command_publisher);
+      DisplayCommandPublisher& command_publisher,
+      PullQueueHT<OneShotBlinkCommand>& rj45_led_blink);
   virtual ~OneShotCountdown();
 
   virtual void on_countdown_complete(void) override;

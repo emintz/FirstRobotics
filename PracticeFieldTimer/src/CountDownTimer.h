@@ -35,6 +35,7 @@
 #include "Arduino.h"
 
 #include "DisplayCommand.h"
+#include "OneShotBlink.h"
 #include "PullQueueHT.h"
 #include "TaskAction.h"
 
@@ -42,15 +43,16 @@ class DisplayCommandPublisher;
 class VoidFunction;
 
 class CountDownTimer : public TaskAction {
-  const int16_t duration_in_seconds;
-  VoidFunction& completed;
-  PullQueueHT<DisplayCommand>& command_queue;
+  const int16_t _duration_in_seconds;
+  VoidFunction& _completed;
+  PullQueueHT<DisplayCommand>& _command_queue;
+  PullQueueHT<OneShotBlinkCommand>& _rj45_blink_queue;
 
-  int16_t seconds_remaining;
-  const int16_t color_change_halfway_mark;
-  const int16_t fast_blink_start;
-  const int16_t slow_blink_start;
-  DisplayCommandPublisher& command_publisher;
+  int16_t _seconds_remaining;
+  const int16_t _color_change_halfway_mark;
+  const int16_t _fast_blink_start;
+  const int16_t _slow_blink_start;
+  DisplayCommandPublisher& _command_publisher;
 
   /*
    * Publish the command to the panel service and, if the CAN bus is
@@ -89,13 +91,16 @@ public:
    * command_queue       Queue for publishing messages to the panel service
    * command_publisher   Publishes the command to the CAN bus if the latter
    *                     is running.
+   * rj45_blink_queue    Carries commands to blink lights on the RJ-45
+   *                     jacks.
    */
   CountDownTimer(
       int16_t duration_in_seconds,
       int16_t end_phase_seconds,
       VoidFunction &completed,
       PullQueueHT<DisplayCommand>& command_queue,
-      DisplayCommandPublisher& command_publisher);
+      DisplayCommandPublisher& command_publisher,
+      PullQueueHT<OneShotBlinkCommand>& rj45_blink_queue);
   virtual ~CountDownTimer();
 
   /*
@@ -109,7 +114,7 @@ public:
    * a continuously running countdown with the schedule.
    */
   void set_remaining(uint16_t seconds_remaining) {
-    this->seconds_remaining = seconds_remaining;
+    this->_seconds_remaining = seconds_remaining;
   }
 };
 

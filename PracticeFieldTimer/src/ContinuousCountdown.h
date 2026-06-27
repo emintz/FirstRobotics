@@ -29,6 +29,7 @@
 #define CONTINUOUSCOUNTDOWN_H_
 
 #include "BaseCountdown.h"
+#include "OneShotCountdown.h"
 
 class DisplayCommandPublisher;
 
@@ -60,6 +61,8 @@ public:
    * command_queue        Carries display commands to the panel server.
    * command_publisher    Publishes the command to the CAN bus if the
    *                      latter is running.
+   * rj45_led_blink       Carries commands to blink the RJ45 socket
+   *                      LEDs.
    */
   ContinuousCountdown(
       uint8_t sqw_pin,
@@ -67,7 +70,8 @@ public:
       int16_t end_phase_seconds,
       int16_t reference_time,
       PullQueueHT<DisplayCommand>& command_queue,
-      DisplayCommandPublisher& command_publisher);
+      DisplayCommandPublisher& command_publisher,
+      PullQueueHT<OneShotBlinkCommand>& rj45_led_blink);
   virtual ~ContinuousCountdown();
 };
 

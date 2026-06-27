@@ -41,7 +41,7 @@ public:
 
 void BaseCountdown::maybe_set_initial_duration(int16_t initial_duration_seconds)  {
   if (0 < initial_duration_seconds) {
-    timer->set_remaining(initial_duration_seconds);
+    _timer->set_remaining(initial_duration_seconds);
   }
 }
 
@@ -51,26 +51,29 @@ BaseCountdown::BaseCountdown(
     int16_t end_phase_seconds,
     int16_t reference_time,
     PullQueueHT<DisplayCommand>& command_queue,
-    DisplayCommandPublisher& command_publisher) :
-        duration_in_seconds(duration_in_seconds),
-        state(State::CREATED) {
-  on_completion = std::make_unique<OnCompletion>(this);
-  timer = std::make_unique<CountDownTimer>(
+    DisplayCommandPublisher& command_publisher,
+    PullQueueHT<OneShotBlinkCommand>& rj45_led_blink) :
+        _duration_in_seconds(duration_in_seconds),
+        _rj45_led_blink(rj45_led_blink),
+        _state(State::CREATED) {
+  _on_completion = std::make_unique<OnCompletion>(this);
+  _timer = std::make_unique<CountDownTimer>(
       duration_in_seconds,
       end_phase_seconds,
-      *(on_completion.get()),
+      *(_on_completion.get()),
       command_queue,
-      command_publisher);
-  task = std::make_unique<TaskWithActionH>(
+      command_publisher,
+      rj45_led_blink);
+  _task = std::make_unique<TaskWithActionH>(
       "continuous",
       COUNTDOWN_TASK_PRIORITY,
-      timer.get(),
+      _timer.get(),
       8192);
-  notify_function = std::make_unique<NotifyFromISR>(task.get());
-  sqw_detector = std::make_unique<GpioChangeDetector>(
+  _notify_function = std::make_unique<NotifyFromISR>(_task.get());
+  _sqw_detector = std::make_unique<GpioChangeDetector>(
       sqw_pin,
       GpioChangeType::HIGH_TO_LOW,
-      notify_function.get());
+      _notify_function.get());
   Serial.println("Countdown created.");
 }
 
@@ -79,20 +82,20 @@ BaseCountdown::~BaseCountdown() {
 
 void BaseCountdown::enable(int initial_duration_seconds) {
   Serial.printf("Countdown starting with initial duration: %d.\n", initial_duration_seconds);
-  switch (state) {
+  switch (_state) {
   case State::CREATED:
     maybe_set_initial_duration(
         static_cast<int16_t>(initial_duration_seconds));
-    task->start();
-    sqw_detector->start();
-    state = State::RUNNING;
+    _task->start();
+    _sqw_detector->start();
+    _state = State::RUNNING;
     break;
   case State::PAUSED:
     maybe_set_initial_duration(
         static_cast<int16_t>(initial_duration_seconds));
-    task->start();
-    sqw_detector->start();
-    state = State::RUNNING;
+    _task->start();
+    _sqw_detector->start();
+    _state = State::RUNNING;
     break;
   case State::RUNNING:
     break;
@@ -100,7 +103,7 @@ void BaseCountdown::enable(int initial_duration_seconds) {
 }
 
 void BaseCountdown::disable(void) {
-  switch (state) {
+  switch (_state) {
   case State::CREATED:
     // Not running, nothing to do.
     break;
@@ -108,8 +111,8 @@ void BaseCountdown::disable(void) {
     // Not running here, either. Nothing to do.
     break;
   case State::RUNNING:
-    sqw_detector->stop();
-    state = State::PAUSED;
+    _sqw_detector->stop();
+    _state = State::PAUSED;
     break;
   }
 }

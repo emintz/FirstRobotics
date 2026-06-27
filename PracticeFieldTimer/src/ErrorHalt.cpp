@@ -56,6 +56,7 @@ std::map<int, const char *> MESSAGES = {
     {GPIO_CHANGE_STARTUP_FAILED, "ERR: GPIO Change"},
     {CAN_INIT_FAILED, "ERR: CAN Init"},
     {CAN_START_FAILED, "CAN Start"},
+    {RJ45_BLINK_START_FAILED, "RJ45 Blink"},
 };
 
 ErrorHalt::ErrorHalt() :

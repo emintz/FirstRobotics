@@ -32,7 +32,8 @@ ManualCountdown::ManualCountdown(
     int16_t duration_in_seconds,
     int16_t end_phase_seconds,
     PullQueueHT<DisplayCommand>& command_queue,
-    DisplayCommandPublisher& command_publisher) :
+    DisplayCommandPublisher& command_publisher,
+    PullQueueHT<OneShotBlinkCommand>& rj45_led_blink) :
         command_queue(command_queue),
         command_publisher(command_publisher),
         actual_countdown(
@@ -40,7 +41,8 @@ ManualCountdown::ManualCountdown(
             duration_in_seconds,
             end_phase_seconds,
             command_queue,
-            command_publisher),
+            command_publisher,
+            rj45_led_blink),
        countdown_enable(actual_countdown),
        on_pin_change(
            start_pin,

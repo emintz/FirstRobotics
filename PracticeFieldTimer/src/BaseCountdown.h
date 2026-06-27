@@ -31,6 +31,7 @@
 #include "CountDownTimer.h"
 #include "DisplayCommand.h"
 #include "GpioChangeDetector.h"
+#include "OneShotBlink.h"
 #include "PullQueueHT.h"
 #include "TaskAction.h"
 #include "TaskWithActionH.h"
@@ -50,13 +51,14 @@ class BaseCountdown {
     PAUSED,
   };
 
-  std::atomic<State> state;
-  const int16_t duration_in_seconds;
-  std::unique_ptr<VoidFunction> on_completion;
-  std::unique_ptr<VoidFunction> notify_function;
-  std::unique_ptr<CountDownTimer> timer;
-  std::unique_ptr<GpioChangeDetector> sqw_detector;
-  std::unique_ptr<TaskWithActionH> task;
+  std::atomic<State> _state;
+  PullQueueHT<OneShotBlinkCommand>& _rj45_led_blink;
+  const int16_t _duration_in_seconds;
+  std::unique_ptr<VoidFunction> _on_completion;
+  std::unique_ptr<VoidFunction> _notify_function;
+  std::unique_ptr<CountDownTimer> _timer;
+  std::unique_ptr<GpioChangeDetector> _sqw_detector;
+  std::unique_ptr<TaskWithActionH> _task;
 
   /*
    * Sets the duration of the next count down if
@@ -100,6 +102,8 @@ protected:
    * command_queue        Carries display commands to the panel server.
    * command_publisher    Publishes the command to the CAN bus if the
    *                      latter is running.
+   * rj45_led_blink       Carries commands to blink the RJ-45 socket
+   *                      LEDs.
    *
    */
   BaseCountdown(
@@ -108,7 +112,8 @@ protected:
       int16_t end_phase_seconds,
       int16_t reference_time,
       PullQueueHT<DisplayCommand>& command_queue,
-      DisplayCommandPublisher& command_pubisher);
+      DisplayCommandPublisher& command_pubisher,
+      PullQueueHT<OneShotBlinkCommand>& rj45_blink);
 public:
   virtual ~BaseCountdown();
 

@@ -34,14 +34,16 @@ ContinuousCountdown::ContinuousCountdown(
     int16_t end_phase_seconds,
     int16_t reference_time,
     PullQueueHT<DisplayCommand>& command_queue,
-    DisplayCommandPublisher& command_publisher) :
+    DisplayCommandPublisher& command_publisher,
+    PullQueueHT<OneShotBlinkCommand>& rj45_led_blink) :
       BaseCountdown(
           sqw_pin,
           duration_in_seconds,
           end_phase_seconds,
           reference_time,
           command_queue,
-          command_publisher) {
+          command_publisher,
+          rj45_led_blink) {
 }
 
 ContinuousCountdown::~ContinuousCountdown() {

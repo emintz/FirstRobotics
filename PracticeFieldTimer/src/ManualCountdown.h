@@ -65,6 +65,8 @@ public:
    * command_publisher    Publishes display events to the CAN bus if
    *                      the latter is enabled. Does nothing if the
    *                      bus is disabled.
+   * rj45_led_blink       Carries commands to blink the RJ45 socket
+   *                      LEDs.
    */
   ManualCountdown(
       uint8_t start_pin,
@@ -72,7 +74,8 @@ public:
       int16_t duration_in_seconds,
       int16_t end_phase_seconds,
       PullQueueHT<DisplayCommand>& command_queue,
-      DisplayCommandPublisher& command_publisher);
+      DisplayCommandPublisher& command_publisher,
+      PullQueueHT<OneShotBlinkCommand>& rj45_led_blink);
   virtual ~ManualCountdown();
 
   /*

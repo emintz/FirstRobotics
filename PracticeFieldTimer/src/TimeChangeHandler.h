@@ -31,6 +31,7 @@
 
 #include "CanPayloadHandler.h"
 #include "DisplayCommand.h"
+#include "OneShotBlink.h"
 #include "PullQueueHT.h"
 
 class CanBus;
@@ -38,6 +39,7 @@ class CanPayload;
 
 class TimeChangeHandler final : public CanPayloadHandler {
   PullQueueHT<DisplayCommand>& panel_command_queue;
+  PullQueueHT<OneShotBlinkCommand>& _rj45_blink_queue;
 
 public:
 
@@ -50,9 +52,12 @@ public:
    * ------------------- ----------------------------------------------------
    * panel_command_queue Forwards time display commands to the panel server
    *                     for eventual, ideally prompt display
+   * rj45_blink_queue    Carries the command to blink the yellow LEDS
+   *                     on the RJ-45 jacks
    */
   TimeChangeHandler(
-      PullQueueHT<DisplayCommand>& panel_command_queue);
+      PullQueueHT<DisplayCommand>& panel_command_queue,
+      PullQueueHT<OneShotBlinkCommand>& rj45_blink_queue);
   virtual ~TimeChangeHandler();
 
   /*

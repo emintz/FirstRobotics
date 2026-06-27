@@ -38,6 +38,7 @@
 #include "ErrorHalt.h"
 #include "Flash32.h"
 #include "ManualCountdown.h"
+#include "OneShotBlink.h"
 #include "PanelServer.h"
 #include "PinAssignments.h"
 #include "PressAndHold.h"
@@ -227,6 +228,15 @@ static const IPAddress subnet(255, 255, 255, 0);
 static LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_COLUMNS, LCD_ROWS);
 static StatusLcd status_display(lcd);
 
+// Blinkenlights on the RJ-45 sockets
+static PullQueueHT<OneShotBlinkCommand> rj45_blink_queue(3);
+static OneShotBlink rj45_blink(rj45_blink_queue);
+static TaskWithActionH rj45_blink_task(
+    "RJ45 Blink",
+    RJ45_BLINK_PRIORITY,
+    &rj45_blink,
+    4096);
+
 // Time configuration.
 static int32_t reference_time_utc = 0;
 static int32_t auto_field_time_minutes = 0;
@@ -257,10 +267,24 @@ static TaskWithActionH server_task(
 static std::unique_ptr<ContinuousCountdown> continuous_count_down;
 static std::unique_ptr<ManualCountdown> manual_count_down;
 
-static TimeChangeHandler incoming_time_change_handler(command_queue);
+static TimeChangeHandler incoming_time_change_handler(
+    command_queue,
+    rj45_blink_queue);
 static CanBus can_bus(CAN_RECEIVE_PIN, CAN_TRANSMIT_PIN, CanBusSpeed::BPS_100K);
 static CANDisplayCommandPublisher to_can_bus(can_bus);
 static WebServer web_server;
+
+static void start_rj45_blink(void) {
+  Serial.println("Starting RJ45 LED blink task.");
+  if (rj45_blink_queue.begin()
+      && rj45_blink_task.start()) {
+    Serial.println("RJ45 LED blink task started.");
+    return;
+  }
+  ErrorHalt::halt_and_catch_fire(
+      RJ45_BLINK_START_FAILED,
+      "RJ45 blink task start failed");
+}
 
 /**
  * Prints chip characteristics -- helpful for debugging.
@@ -544,7 +568,8 @@ static void start_automatic_countdown(void) {
       all_red_period,
       reference_time_utc_seconds,
       command_queue,
-      to_can_bus);
+      to_can_bus,
+      rj45_blink_queue);
 
   int16_t sync_time_seconds =
       reference_time_utc_seconds % auto_field_time_seconds;
@@ -571,7 +596,8 @@ void start_manual_countdown(void) {
       manual_field_time_seconds,
       60,
       command_queue,
-      to_can_bus);
+      to_can_bus,
+      rj45_blink_queue);
   manual_count_down->start();
   clear_panel();
 }
@@ -685,6 +711,10 @@ void setup() {
   pinMode(FOLLOWER_NOT_PIN, INPUT_PULLUP);
   pinMode(MANUAL_ENABLE_NOT_PIN, INPUT_PULLUP);
   pinMode(SQUARE_WAVE_PIN, INPUT);
+  pinMode(RJ45_A_YELLOW, OUTPUT);
+  pinMode(RJ45_A_GREEN, OUTPUT);
+  pinMode(RJ45_B_YELLOW, OUTPUT);
+  pinMode(RJ45_B_GREEN, OUTPUT);
 
   Serial.begin(115200);
   Serial.println("Serial I/O initialized.");
@@ -695,6 +725,8 @@ void setup() {
 
   init_i2c();
 
+  start_rj45_blink();
+
   panel.clear();
   TextDisplay text_display;
   text_display(setup_bitmap, {0, 63, 0}, panel);
@@ -703,6 +735,10 @@ void setup() {
   blink_it(RED_LED_PIN);
   blink_it(YELLOW_LED_PIN);
   blink_it(GREEN_LED_PIN);
+  blink_it(RJ45_B_YELLOW);
+  blink_it(RJ45_B_GREEN);
+  blink_it(RJ45_A_YELLOW);
+  blink_it(RJ45_A_GREEN);
 
   if (digitalRead(FOLLOWER_NOT_PIN) == HIGH) {
     start_time_services();

@@ -25,42 +25,51 @@
 #include "CountDownTimer.h"
 
 #include "DisplayCommandPublisher.h"
+#include "PinAssignments.h"
 #include "VoidFunction.h"
 
+static OneShotBlinkCommand blink_rj45_green = {
+    ._on_time_ms = 50,
+    ._pin_count = 2,
+    ._blink_pin = {RJ45_A_GREEN, RJ45_B_GREEN},
+};
+
 void CountDownTimer::publish_command(DisplayCommand& display_command) {
-  command_queue.send_message(&display_command);
-  command_publisher(display_command);
+  if (_command_queue.send_message(&display_command)) {
+    _rj45_blink_queue.send_message(&blink_rj45_green, 1);
+  }
+  _command_publisher(display_command);
 }
 
 void CountDownTimer::show_blink_time(void) {
   DisplayCommand display_command;
   memset(&display_command, 0, sizeof(display_command));
   display_command.command =
-      fast_blink_start <= seconds_remaining
+      _fast_blink_start <= _seconds_remaining
       ? DisplayCommand::Pattern::SLOW_BLINK_TIME
       : DisplayCommand::Pattern::FAST_BLINK_TIME;
-  display_command.time_in_seconds = seconds_remaining;
+  display_command.time_in_seconds = _seconds_remaining;
   display_command.foreground.red = 63;
   publish_command(display_command);
-  command_publisher(display_command);
+  _command_publisher(display_command);
  }
 
 void CountDownTimer::show_plain_time(void) {
   DisplayCommand display_command;
   memset(&display_command, 0, sizeof(display_command));
   display_command.command = DisplayCommand::Pattern::PLAIN_TIME;
-  display_command.time_in_seconds = seconds_remaining;
+  display_command.time_in_seconds = _seconds_remaining;
 
-  int16_t color_change_time = seconds_remaining - slow_blink_start;
-  if (color_change_time <= color_change_halfway_mark) {
+  int16_t color_change_time = _seconds_remaining - _slow_blink_start;
+  if (color_change_time <= _color_change_halfway_mark) {
       int green_intensity =
-          (63 * color_change_time) / color_change_halfway_mark;
+          (63 * color_change_time) / _color_change_halfway_mark;
       display_command.foreground.green = green_intensity;
       display_command.foreground.red = 63 - display_command.foreground.green;
     } else {
-      color_change_time -= color_change_halfway_mark;
+      color_change_time -= _color_change_halfway_mark;
       int blue_intensity =
-          (63 * color_change_time) / color_change_halfway_mark;
+          (63 * color_change_time) / _color_change_halfway_mark;
       display_command.foreground.blue = blue_intensity;
       display_command.foreground.green = 63 - display_command.foreground.blue;
     }
@@ -72,16 +81,18 @@ CountDownTimer::CountDownTimer(
     int16_t end_phase_seconds,
     VoidFunction &completed,
     PullQueueHT<DisplayCommand>& command_queue,
-    DisplayCommandPublisher& command_publisher) :
-        duration_in_seconds(duration_in_seconds),
-        completed(completed),
-        command_queue(command_queue),
-        seconds_remaining(duration_in_seconds),
-        color_change_halfway_mark(
+    DisplayCommandPublisher& command_publisher,
+    PullQueueHT<OneShotBlinkCommand>& rj45_blink_queue) :
+        _duration_in_seconds(duration_in_seconds),
+        _completed(completed),
+        _command_queue(command_queue),
+        _rj45_blink_queue(rj45_blink_queue),
+        _seconds_remaining(duration_in_seconds),
+        _color_change_halfway_mark(
             (duration_in_seconds - end_phase_seconds) / 2),
-        fast_blink_start(end_phase_seconds / 2),
-        slow_blink_start(end_phase_seconds),
-        command_publisher(command_publisher) {
+        _fast_blink_start(end_phase_seconds / 2),
+        _slow_blink_start(end_phase_seconds),
+        _command_publisher(command_publisher) {
 }
 
 CountDownTimer::~CountDownTimer() {
@@ -90,16 +101,16 @@ CountDownTimer::~CountDownTimer() {
 void CountDownTimer::run(void) {
   while (true) {
     wait_for_notification();
-    if (seconds_remaining < slow_blink_start) {
+    if (_seconds_remaining < _slow_blink_start) {
       show_blink_time();
     } else {
       show_plain_time();
     }
-    if (0 < seconds_remaining) {
-      --seconds_remaining;
+    if (0 < _seconds_remaining) {
+      --_seconds_remaining;
     } else {
-      completed.apply();
-      seconds_remaining = duration_in_seconds;
+      _completed.apply();
+      _seconds_remaining = _duration_in_seconds;
     }
   }
 }
