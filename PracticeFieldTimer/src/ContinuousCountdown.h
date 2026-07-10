@@ -1,78 +1,117 @@
 /*
  * ContinuousCountdown.h
  *
- *  Created on: May 23, 2025
+ *  Created on: Jul 7, 2026
  *      Author: Eric Mintz
  *
- * A count down that runs continuously. The countdown start is pinned
- * to a start time that is specified at construction. All times
- * *should* be in UTC.
- *
- * Copyright (C) 2025 Eric Mintz
- * All Rights Reserved
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * A countdown that runs continuously, automatically restarting
+ * after it reaches 00:00. Countdown starts relative to a reference
+ * time expressed in seconds since midnight, UTC
  */
 
 #ifndef CONTINUOUSCOUNTDOWN_H_
 #define CONTINUOUSCOUNTDOWN_H_
 
-#include "BaseCountdown.h"
-#include "OneShotCountdown.h"
+#include <Arduino.h>
 
-class DisplayCommandPublisher;
+#include "Countdown.h"
 
-class ContinuousCountdown : public BaseCountdown {
+#include <VoidFunction.h>
 
-  virtual void on_countdown_complete(void) override;
+class Countdown;
+
+class ContinuousCountdown {
+
+  /**
+   * VoidFunction that starts the count. The countdown invokes this method
+   * when the count ends, leading to an endless loop of countdowns, as
+   * desired. Lather, rinse, repeat!
+   *
+   * RestartCount instances are used ONLY within a ContinuousCountdown
+   * instance and hold data used by the containing instance.
+   */
+  class RestartCount : public VoidFunction {
+    Countdown& _countdown;
+    const uint32_t _duration_in_seconds;
+  public:
+
+    /**
+     * Construct new instance from the specified values.
+     *
+     * Parameters:
+     *
+     * Name                Contents
+     * ------------------- -------------------------------------------------
+     * countdown           Runs a single countdown and stops
+     * duration_in_minutes Session (i.e. countdown) duration in minutes
+     *                     MUST be strictly positive (i.e. greater than 0)
+     */
+    RestartCount(
+        Countdown& countdown,
+        uint32_t duration_in_minutes) :
+          _countdown(countdown),
+          _duration_in_seconds(duration_in_minutes * 60) {
+    }
+
+    virtual ~RestartCount() = default;
+
+    virtual void apply(void) override {
+      _countdown.start_from_ISR(_duration_in_seconds, this);
+    }
+
+    Countdown& countdown(void) {
+      return _countdown;
+    }
+
+    uint32_t duration_seconds(void) {
+      return _duration_in_seconds;
+    }
+  };
+
+  /**
+   * Start times MUST be set so that a countdown starts
+   * at the reference time, which is seconds since
+   * midnight UTC.
+   */
+  const uint32_t _reference_time_seconds;
+
+  /**
+   * Invoked when the currently running countdown ends.
+   */
+  RestartCount _on_stop;
 
 public:
-  /*
-   * Constructs a newly initialized instance.
-   *
-   * Note that all times are 24 hour UTC.
+  /**
+   * Constructs an instance from the specified values.
    *
    * Parameters:
-   * ----------
    *
-   * Name                 Contents
-   * -----------------    ------------------------------------------------
-   * sqw_pin              GPIO pin that receives a precise 1Hz square wave,
-   *                      the count down driver.
-   * duration_in_seconds  Countdown duration (length) in seconds. Must be
-   *                      > 0.
-   * end_phase_seconds    Number of seconds to blink the time at session
-   *                      expiry. Should be > 0.
-   * reference_time       A time when a session must start. This is used
-   *                      to synchronize session start with clock time.
-   *                      This is useful for running, say, 12 minute
-   *                      sessions starting at 0900.
-   * command_queue        Carries display commands to the panel server.
-   * command_publisher    Publishes the command to the CAN bus if the
-   *                      latter is running.
-   * rj45_led_blink       Carries commands to blink the RJ45 socket
-   *                      LEDs.
+   * Name                   Contents
+   * ---------------------- --------------------------------------------------
+   * countdown              Low level class that performs a single countdown
+   *                        then stops.
+   * reference_time_minutes Start time anchor in minutes since midnight
+   *                        UTC
+   * duration_minutes       Session (i.e. countdown) duration in minutes
    */
   ContinuousCountdown(
-      uint8_t sqw_pin,
-      int16_t duration_in_seconds,
-      int16_t end_phase_seconds,
-      int16_t reference_time,
-      PullQueueHT<DisplayCommand>& command_queue,
-      DisplayCommandPublisher& command_publisher,
-      PullQueueHT<OneShotBlinkCommand>& rj45_led_blink);
-  virtual ~ContinuousCountdown();
+      Countdown& countdown,
+      uint32_t reference_time_minutes,
+      uint32_t duration_minutes);
+
+  virtual ~ContinuousCountdown() = default;
+
+  /**
+   * Starts a countdown.
+   *
+   * Parameters:
+   *
+   * Name                   Contents
+   * ---------------------- -------------------------------------------
+   * seconds_since_midnight The current time of day in seconds since
+   *                        midnight UTC.
+   */
+  void start(uint32_t seconds_since_midnight);
 };
 
 #endif /* CONTINUOUSCOUNTDOWN_H_ */

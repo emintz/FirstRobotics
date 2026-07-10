@@ -27,6 +27,10 @@
 #define CANDISPLAYCOMMANDPUBLISHER_H_
 
 #include "DisplayCommandPublisher.h"
+#include "OneShotBlink.h"
+#include "StatusLcd.h"
+
+#include <PullQueueHT.h>
 
 class CanBus;
 class DisplayCommand;
@@ -34,7 +38,9 @@ class DisplayCommand;
 class CANDisplayCommandPublisher final :
     public DisplayCommandPublisher {
 
-  CanBus& can_bus;
+  CanBus& _can_bus;
+  PullQueueHT<OneShotBlinkCommand>& _rj45_blink_queue;
+  StatusLcd& _status_display;
 public:
 
   /*
@@ -46,8 +52,14 @@ public:
    * Name                 Contents
    * -----------------    ------------------------------------------------
    * can_bus              Where to publish the command
+   * rj45_blink_queue     Carries commands that blink the LEDs on the
+   *                      RJ45 jack.
+   * status_display       LCD status panel
    */
-  CANDisplayCommandPublisher(CanBus& can_bus);
+  CANDisplayCommandPublisher(
+      CanBus& can_bus,
+      PullQueueHT<OneShotBlinkCommand>& rj45_blink_queue,
+      StatusLcd& status_display);
 
   /*
    * Publishes a display command to the CAN bus and show

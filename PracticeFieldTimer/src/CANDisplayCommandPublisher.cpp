@@ -31,9 +31,21 @@
 #include "PinAssignments.h"
 #include "TimeChangePayload.h"
 
+static const char *can_failure = "FAIL";
+
+static const OneShotBlinkCommand blink_rj45_green = {
+    ._on_time_ms = 50,
+    ._pin_count = 2,
+    ._blink_pin = {RJ45_A_GREEN, RJ45_B_GREEN},
+};
+
 CANDisplayCommandPublisher::CANDisplayCommandPublisher(
-    CanBus& can_bus) :
-    can_bus(can_bus) {
+    CanBus& can_bus,
+    PullQueueHT<OneShotBlinkCommand>& rj45_blink_queue,
+    StatusLcd& status_display) :
+    _can_bus(can_bus),
+    _rj45_blink_queue(rj45_blink_queue),
+    _status_display(status_display) {
 }
 
 void CANDisplayCommandPublisher::operator()(const DisplayCommand& command) {
@@ -46,12 +58,10 @@ void CANDisplayCommandPublisher::operator()(const DisplayCommand& command) {
 
   time_display_message.set_id(static_cast<int>(command.command))
       .set_data(time_change);
-  CanBusOpStatus send_status = can_bus.transmit(time_display_message, 2);
+  CanBusOpStatus send_status = _can_bus.transmit(time_display_message, 2);
   if (CanBusOpStatus::SUCCEEDED == send_status) {
-    digitalWrite(RED_LED_PIN, LOW);
-    digitalWrite(GREEN_LED_PIN, HIGH);
-  } else {
-    digitalWrite(RED_LED_PIN, HIGH);
-    digitalWrite(GREEN_LED_PIN, LOW);
+    _rj45_blink_queue.send_message(&blink_rj45_green, 1);
   }
+  // TODO: display failure. There's a problem in the StatusLce which
+  //       messes up the display.
 }

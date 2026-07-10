@@ -57,10 +57,11 @@ void StatusLcd::automatic_mode() {
 }
 
 void StatusLcd::can_bus_status(const char *message) {
-  clear_field(CAN_STATUS_COLUMN, CAN_STATUS_ROW, CAN_STATUS_LENGTH);
-  uint8_t message_column = CAN_STATUS_COLUMN
-      + display(CAN_STATUS_COLUMN, CAN_STATUS_ROW, "CAN ");
-  display(message_column, CAN_STATUS_ROW, message);
+  char buffer[22];
+  memset(buffer, '\0', sizeof(buffer));
+  strcpy(buffer, "CAN ");
+  strncat(buffer, message, CAN_STATUS_LENGTH - 4);
+  display(CAN_STATUS_COLUMN, CAN_STATUS_ROW, buffer);
 }
 
 void StatusLcd::clear(void) {

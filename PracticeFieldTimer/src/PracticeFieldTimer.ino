@@ -31,6 +31,7 @@
 #include "Configurator.h"
 #include "ConfigurationCancelledPage.h"
 #include "ContinuousCountdown.h"
+#include "Countdown.h"
 #include <DataTypeCharacteristics.h>
 #include "DataTypes.h"
 #include "DisplayCommand.h"
@@ -263,22 +264,46 @@ static TaskWithActionH server_task(
     PANEL_PRIORITY,
     &server,
     4096);
-
-static std::unique_ptr<ContinuousCountdown> continuous_count_down;
-static std::unique_ptr<ManualCountdown> manual_count_down;
-
 static TimeChangeHandler incoming_time_change_handler(
     command_queue,
     rj45_blink_queue);
 static CanBus can_bus(CAN_RECEIVE_PIN, CAN_TRANSMIT_PIN, CanBusSpeed::BPS_100K);
-static CANDisplayCommandPublisher to_can_bus(can_bus);
+static CANDisplayCommandPublisher to_can_bus(
+    can_bus, rj45_blink_queue, status_display);
+
+static Countdown countdown(
+    SQUARE_WAVE_PIN,
+    30,
+    30,
+    command_queue,
+    to_can_bus
+  );
+static TaskWithActionH countdown_task(
+    "Countdown",
+    COUNTDOWN_TASK_PRIORITY,
+    &countdown,
+    4096);
+
+
+static std::unique_ptr<ContinuousCountdown> continuous_count_down;
+static std::unique_ptr<ManualCountdown> manual_count_down;
+
 static WebServer web_server;
 
+static void dump_pin(uint8_t pin, const char * name) {
+  const char *value = LOW == digitalRead(pin)
+      ? "LOW" : "HIGH";
+  Serial.printf("Pin number %u (%s) is %s\n",
+      static_cast<unsigned int>(pin),
+      name,
+      value);
+}
+
 static void start_rj45_blink(void) {
-  Serial.println("Starting RJ45 LED blink task.");
+  Serial.println("Starting RJ45 LED blink queue.");
   if (rj45_blink_queue.begin()
       && rj45_blink_task.start()) {
-    Serial.println("RJ45 LED blink task started.");
+    Serial.println("RJ45 LED blink queue started.");
     return;
   }
   ErrorHalt::halt_and_catch_fire(
@@ -488,6 +513,10 @@ static void configure_if_requested(void) {
  *                      opened for read-only.
  * key                  NULL-terminated value key. Cannot be NULL or
  *                      empty.
+static std::unique_ptr<ContinuousCountdown> continuous_count_down;
+static std::unique_ptr<ManualCountdown> manual_count_down;
+
+ *
  * value                Receives the parameter value, if found,
  *                      contents unspecified if the parameter is
  *                      missing.
@@ -563,23 +592,10 @@ static void start_automatic_countdown(void) {
   int16_t auto_field_time_seconds = 60 * auto_field_time_minutes;
   int16_t reference_time_utc_seconds = 60 * reference_time_utc;
   continuous_count_down = std::make_unique<ContinuousCountdown>(
-      SQUARE_WAVE_PIN,
-      auto_field_time_seconds,
-      all_red_period,
-      reference_time_utc_seconds,
-      command_queue,
-      to_can_bus,
-      rj45_blink_queue);
-
-  int16_t sync_time_seconds =
-      reference_time_utc_seconds % auto_field_time_seconds;
-  int16_t rump_offset_time =
-      ds3231.seconds_since_midnight() % auto_field_time_seconds;
-  if (sync_time_seconds < rump_offset_time) {
-    sync_time_seconds += auto_field_time_seconds;
-  }
-  continuous_count_down->enable(
-      sync_time_seconds - rump_offset_time);
+      countdown,
+      reference_time_utc,
+      auto_field_time_minutes);
+  continuous_count_down->start(ds3231.seconds_since_midnight());
 }
 
 /*
@@ -589,15 +605,11 @@ static void start_automatic_countdown(void) {
  */
 void start_manual_countdown(void) {
   int16_t manual_field_time_seconds = 60 * manual_field_time_minutes;
-  GpioChangeService.begin();
   manual_count_down = std::make_unique<ManualCountdown>(
       SET_CONFIGURATION_PIN,
-      SQUARE_WAVE_PIN,
-      manual_field_time_seconds,
-      60,
+      countdown,
       command_queue,
-      to_can_bus,
-      rj45_blink_queue);
+      manual_field_time_seconds);
   manual_count_down->start();
   clear_panel();
 }
@@ -610,7 +622,13 @@ void start_manual_countdown(void) {
  * connected by a SPDT ON-OFF-ON switch, the harware should
  * enforce this.
  */
-static void maybe_start_continuous_countdown(void) {
+static void maybe_start_countdown(void) {
+  Serial.println("Starting countdown task");
+  if (!countdown_task.start()) {
+    ErrorHalt::halt_and_catch_fire(
+        COUNTDOWN_TASK_START_FAILED,
+        "Countdown task failed to start.");
+  }
   if (digitalRead(MANUAL_ENABLE_NOT_PIN) == HIGH) {
     Serial.println("Starting the automatic, continuously running countdown.");
     start_automatic_countdown();
@@ -723,6 +741,10 @@ void setup() {
 
   show_machine_characteristics();
 
+  dump_pin(MANUAL_ENABLE_NOT_PIN, "MANUAL_ENABLE_NOT_PIN");
+  dump_pin(FOLLOWER_NOT_PIN, "FOLLOWER_NOT_PIN");
+  dump_pin(CAN_ENABLE_NOT_PIN, "CAN_ENABLE_NOT_PIN");
+
   init_i2c();
 
   start_rj45_blink();
@@ -739,6 +761,8 @@ void setup() {
   blink_it(RJ45_B_GREEN);
   blink_it(RJ45_A_YELLOW);
   blink_it(RJ45_A_GREEN);
+
+  Countdown::begin();
 
   if (digitalRead(FOLLOWER_NOT_PIN) == HIGH) {
     start_time_services();
@@ -772,7 +796,7 @@ void setup() {
    */
   if (digitalRead(FOLLOWER_NOT_PIN) == HIGH) {
     Serial.println("Configured as leader, starting countdown.");
-    maybe_start_continuous_countdown();
+    maybe_start_countdown();
   } else {
     status_display.follow_mode();
     clear_panel();

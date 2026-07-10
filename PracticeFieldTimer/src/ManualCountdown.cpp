@@ -1,11 +1,11 @@
 /*
  * ManualCountdown.cpp
  *
- *  Created on: Jun 15, 2025
+ *  Created on: Jul 6, 2026
  *      Author: Eric Mintz
  *
- * Copyright (C) 2025 Eric Mintz
- * All Rights Reserved
+ * Copyright 2026 Metuchen Momentum LLC.
+ * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -23,34 +23,23 @@
 
 #include "ManualCountdown.h"
 
-#include "DisplayCommandPublisher.h"
-#include "TaskAction.h"
-
 ManualCountdown::ManualCountdown(
     uint8_t start_pin,
-    uint8_t sqw_pin,
-    int16_t duration_in_seconds,
-    int16_t end_phase_seconds,
-    PullQueueHT<DisplayCommand>& command_queue,
-    DisplayCommandPublisher& command_publisher,
-    PullQueueHT<OneShotBlinkCommand>& rj45_led_blink) :
-        command_queue(command_queue),
-        command_publisher(command_publisher),
-        actual_countdown(
-            sqw_pin,
-            duration_in_seconds,
-            end_phase_seconds,
-            command_queue,
-            command_publisher,
-            rj45_led_blink),
-       countdown_enable(actual_countdown),
-       on_pin_change(
-           start_pin,
-           GpioChangeType::HIGH_TO_LOW,
-           "ManualCount",
-           19,
-           countdown_enable) {
+    Countdown& countdown,
+    PullQueueHT<DisplayCommand>& display_command_queue,
+    uint16_t duration_in_seconds) :
+      _start_countdown_function(
+          countdown,
+          display_command_queue,
+          duration_in_seconds),
+      _countdown_start_detector(
+          start_pin,
+          GpioChangeType::HIGH_TO_LOW,
+          &_start_countdown_function) {
+
 }
 
-ManualCountdown::~ManualCountdown() {
+bool ManualCountdown::start(void) {
+  return _countdown_start_detector.start();
 }
+

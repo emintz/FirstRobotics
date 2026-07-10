@@ -1,51 +1,32 @@
 /*
  * ContinuousCountdown.cpp
  *
- *  Created on: May 23, 2025
- *      Author: Eric Mintz
- *
- * A count down that automatically restarts.
- *
- * Copyright (C) 2025 Eric Mintz
- * All Rights Reserved
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *  Created on: Jul 7, 2026
+ *      Author: Eruc Mintz
  */
 
-#include "ContinuousCountdown.h"
+#include "TimeSource.h"
 
-void ContinuousCountdown::on_countdown_complete(void) {
-}
+#include "ContinuousCountdown.h"
+#include "Countdown.h"
 
 ContinuousCountdown::ContinuousCountdown(
-    uint8_t sqw_pin,
-    int16_t duration_in_seconds,
-    int16_t end_phase_seconds,
-    int16_t reference_time,
-    PullQueueHT<DisplayCommand>& command_queue,
-    DisplayCommandPublisher& command_publisher,
-    PullQueueHT<OneShotBlinkCommand>& rj45_led_blink) :
-      BaseCountdown(
-          sqw_pin,
-          duration_in_seconds,
-          end_phase_seconds,
-          reference_time,
-          command_queue,
-          command_publisher,
-          rj45_led_blink) {
+    Countdown& countdown,
+    uint32_t reference_time_minutes,
+    uint32_t duration_minutes) :
+      _reference_time_seconds(60 + reference_time_minutes),
+      _on_stop(countdown, duration_minutes) {
+  uint32_t duration_seconds = 60 * duration_minutes;
 }
 
-ContinuousCountdown::~ContinuousCountdown() {
-}
+void ContinuousCountdown::start(uint32_t seconds_since_midnight) {
+  uint32_t duration_seconds = _on_stop.duration_seconds();
+  uint32_t sync_time_seconds =
+      _reference_time_seconds % duration_seconds;
+  uint32_t rump_offset_time = seconds_since_midnight % duration_seconds;
+  if ( sync_time_seconds < duration_seconds) {
+    sync_time_seconds += duration_seconds;
+  }
+  _on_stop.countdown().start(sync_time_seconds - rump_offset_time, &_on_stop);
 
+}
