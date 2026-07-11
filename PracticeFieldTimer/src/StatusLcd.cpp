@@ -33,10 +33,11 @@
 #define TIME_COLUMN 7
 #define TIME_ROW 0
 
+static const char *blanks = "                    ";
+
+
 void StatusLcd::clear_field(uint8_t column, uint8_t row, uint8_t size) {
-  while (0 < size) {
-    display(column + (--size), row, " ");
-  }
+  display(column, row, blanks + (column, row, 20 - size));
 }
 
 size_t StatusLcd::display(uint8_t column, uint8_t row, const char *message) {
@@ -61,6 +62,7 @@ void StatusLcd::can_bus_status(const char *message) {
   memset(buffer, '\0', sizeof(buffer));
   strcpy(buffer, "CAN ");
   strncat(buffer, message, CAN_STATUS_LENGTH - 4);
+  clear_field(CAN_STATUS_COLUMN, CAN_STATUS_ROW, CAN_STATUS_LENGTH);
   display(CAN_STATUS_COLUMN, CAN_STATUS_ROW, buffer);
 }
 

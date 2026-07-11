@@ -33,7 +33,7 @@ class VacuousDisplayCommandPublisher final :
 public:
   virtual ~VacuousDisplayCommandPublisher();
 
-  virtual void operator()(const DisplayCommand& command_to_publish);
+  virtual bool operator()(const DisplayCommand& command_to_publish);
 };
 
 #endif /* VACUOUSDISPLAYCOMMANDPUBLISHER_H_ */

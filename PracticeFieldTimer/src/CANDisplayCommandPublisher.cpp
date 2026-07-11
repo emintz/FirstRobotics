@@ -48,7 +48,8 @@ CANDisplayCommandPublisher::CANDisplayCommandPublisher(
     _status_display(status_display) {
 }
 
-void CANDisplayCommandPublisher::operator()(const DisplayCommand& command) {
+bool CANDisplayCommandPublisher::operator()(const DisplayCommand& command) {
+  bool status = true;
   CanPayload time_display_message;
   TimeChangePayload time_change;
   time_change.seconds_since_midnight = command.time_in_seconds;
@@ -59,9 +60,19 @@ void CANDisplayCommandPublisher::operator()(const DisplayCommand& command) {
   time_display_message.set_id(static_cast<int>(command.command))
       .set_data(time_change);
   CanBusOpStatus send_status = _can_bus.transmit(time_display_message, 2);
+  // This is a hack. For some reason, we need to let the CAN bus settle
+  // before we can display its status on the LCD. Danged if I know why,
+  // but there it is.
+  const char *can_status_message = "";
+  vTaskDelay(pdMS_TO_TICKS(15));
   if (CanBusOpStatus::SUCCEEDED == send_status) {
     _rj45_blink_queue.send_message(&blink_rj45_green, 1);
+    can_status_message = "OK";
+  } else {
+    digitalWrite(RED_LED_PIN, HIGH);
+    can_status_message = "FAILED";
+    status = false;
   }
-  // TODO: display failure. There's a problem in the StatusLce which
-  //       messes up the display.
+  _status_display.can_bus_status(can_status_message)
+;  return status;
 }

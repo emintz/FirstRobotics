@@ -67,7 +67,7 @@ public:
    * turn off the red LED and illuminate the green. When
    * publication fails, do the opposite.
    */
-  virtual void operator()(const DisplayCommand& command);
+  virtual bool operator()(const DisplayCommand& command);
 };
 
 #endif /* CANDISPLAYCOMMANDPUBLISHER_H_ */

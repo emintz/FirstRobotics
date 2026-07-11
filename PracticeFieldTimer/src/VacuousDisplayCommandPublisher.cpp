@@ -26,5 +26,7 @@
 VacuousDisplayCommandPublisher::~VacuousDisplayCommandPublisher() {
 }
 
-void VacuousDisplayCommandPublisher::operator()(const DisplayCommand& command_to_publish) {
+bool VacuousDisplayCommandPublisher::operator()(
+    const DisplayCommand& command_to_publish) {
+  return true;
 }

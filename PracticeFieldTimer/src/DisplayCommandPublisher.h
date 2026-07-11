@@ -30,7 +30,7 @@ class DisplayCommand;
 
 class DisplayCommandPublisher {
 public:
-  virtual void operator()(const DisplayCommand& command_to_publish) = 0;
+  virtual bool operator()(const DisplayCommand& command_to_publish) = 0;
 };
 
 #endif /* DISPLAYCOMMANDPUBLISHER_H_ */
