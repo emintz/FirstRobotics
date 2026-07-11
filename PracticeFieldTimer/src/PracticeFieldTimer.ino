@@ -70,6 +70,17 @@
 #define PRESS_TIMEOUT_MS 3000
 #define PRESS_WINDOW_MS 5000
 
+// Pins that contol LEDs.
+static uint8_t led_pins[] = {
+    RED_LED_PIN,
+    YELLOW_LED_PIN,
+    GREEN_LED_PIN,
+    RJ45_B_YELLOW,
+    RJ45_B_GREEN,
+    RJ45_A_YELLOW,
+    RJ45_A_GREEN,
+};
+
 // Bitmap representing "CONFIG" to be displayed
 // when the web page is active.
 static constexpr const uint8_t config_bitmap[] = {
@@ -290,6 +301,16 @@ static std::unique_ptr<ManualCountdown> manual_count_down;
 
 static WebServer web_server;
 
+static void ripple_pins(void) {
+  const uint8_t *current_pin = led_pins;
+  for (int i = 0; i < sizeof(led_pins); ++i) {
+    uint8_t pin = *current_pin++;
+    digitalWrite(pin, static_cast<uint8_t>(HIGH));
+    vTaskDelay(pdMS_TO_TICKS(25));
+    digitalWrite(pin, static_cast<uint8_t>(LOW));
+  }
+}
+
 static void dump_pin(uint8_t pin, const char * name) {
   const char *value = LOW == digitalRead(pin)
       ? "LOW" : "HIGH";
@@ -372,26 +393,6 @@ static void scan_i2c_bus(void) {
     }
   }
   Serial.println("I2C bus scan completed.");
-}
-
-/*
- * Raises and lowers a GPIO pin 4 times/second for one second.
- * This is used during startup.
- *
- * Parameters:
- * ----------
- *
- * Name                 Contents
- * -----------------    ------------------------------------------------
- * pin                  GPIO pin to blink.
- */
-static void blink_it(int pin_no) {
-  for (int i = 0; i < 4; ++i) {
-    digitalWrite(pin_no, HIGH);
-    vTaskDelay(pdMS_TO_TICKS(125));
-    digitalWrite(pin_no, LOW);
-    vTaskDelay(pdMS_TO_TICKS(125));
-  }
 }
 
 /*
@@ -716,19 +717,16 @@ static void start_time_services(void) {
 void setup() {
   pinMode(SET_CONFIGURATION_PIN, INPUT_PULLUP);
   pinMode(RED_LED_PIN, OUTPUT);
-  digitalWrite(RED_LED_PIN, LOW);
-  pinMode(YELLOW_LED_PIN, OUTPUT);
-  digitalWrite(YELLOW_LED_PIN, LOW);
-  pinMode(GREEN_LED_PIN, OUTPUT);
-  digitalWrite(GREEN_LED_PIN, LOW);
   pinMode(CAN_ENABLE_NOT_PIN, INPUT_PULLUP);
   pinMode(FOLLOWER_NOT_PIN, INPUT_PULLUP);
   pinMode(MANUAL_ENABLE_NOT_PIN, INPUT_PULLUP);
   pinMode(SQUARE_WAVE_PIN, INPUT);
-  pinMode(RJ45_A_YELLOW, OUTPUT);
-  pinMode(RJ45_A_GREEN, OUTPUT);
-  pinMode(RJ45_B_YELLOW, OUTPUT);
-  pinMode(RJ45_B_GREEN, OUTPUT);
+
+  for (size_t i = 1; i < sizeof(led_pins); ++i) {
+    uint8_t pin = led_pins[i];
+    pinMode(pin, static_cast<uint8_t>(OUTPUT));
+    digitalWrite(pin, static_cast<uint8_t>(LOW));
+  }
 
   Serial.begin(115200);
   Serial.println("Serial I/O initialized.");
@@ -749,13 +747,9 @@ void setup() {
   TextDisplay text_display;
   text_display(setup_bitmap, {0, 63, 0}, panel);
 
-  blink_it(RED_LED_PIN);
-  blink_it(YELLOW_LED_PIN);
-  blink_it(GREEN_LED_PIN);
-  blink_it(RJ45_B_YELLOW);
-  blink_it(RJ45_B_GREEN);
-  blink_it(RJ45_A_YELLOW);
-  blink_it(RJ45_A_GREEN);
+  for (int i = 0; i < 5; ++i) {
+    ripple_pins();
+  }
 
   Countdown::begin();
 
