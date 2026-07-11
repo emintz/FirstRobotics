@@ -41,11 +41,6 @@
  */
 
 /**
- * Built-in LED on the ESP32 board
- */
-#define BUILTIN_LED_PIN 2
-
-/**
  * Holding this pin LOW on boot brings up a web server
  * that lets users configure the timer. Press to start
  * the countdown when in manual mode.

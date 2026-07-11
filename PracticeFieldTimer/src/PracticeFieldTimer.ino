@@ -486,13 +486,11 @@ static void configure_if_requested(void) {
     display(config_bitmap, {0, 0, 63}, panel);
     Serial.println("Configuring ...");
     wifi_on();
-    digitalWrite(BUILTIN_LED_PIN, HIGH);
     show_wifi_setup();
     set_configuration_parameters();
     display(wait_bitmap, {31, 31, 0}, panel);
     status_display.clear();
     vTaskDelay(pdMS_TO_TICKS(2000));
-    digitalWrite(BUILTIN_LED_PIN, LOW);
     wifi_off();
     panel.clear();
     Serial.println("Configuration complete.");
@@ -716,8 +714,6 @@ static void start_time_services(void) {
  * Configures the timer. Automatically runs once at power on.
  */
 void setup() {
-  pinMode(BUILTIN_LED_PIN, OUTPUT);
-  digitalWrite(BUILTIN_LED_PIN, LOW);
   pinMode(SET_CONFIGURATION_PIN, INPUT_PULLUP);
   pinMode(RED_LED_PIN, OUTPUT);
   digitalWrite(RED_LED_PIN, LOW);
@@ -753,7 +749,6 @@ void setup() {
   TextDisplay text_display;
   text_display(setup_bitmap, {0, 63, 0}, panel);
 
-  blink_it(BUILTIN_LED_PIN);
   blink_it(RED_LED_PIN);
   blink_it(YELLOW_LED_PIN);
   blink_it(GREEN_LED_PIN);

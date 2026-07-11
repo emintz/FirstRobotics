@@ -76,7 +76,7 @@ void ErrorHalt::operator() (int error_code, const char *console_message) const {
 
 void ErrorHalt::halt_and_catch_fire(int error_code, const char *message) {
   BlinkAction action(
-      BUILTIN_LED_PIN,
+      RED_LED_PIN,
       error_code,
       ON_TIME_MS,
       OFF_TIME_MS,
