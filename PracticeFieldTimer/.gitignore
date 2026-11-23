@@ -1,11 +1,12 @@
 /DumpStack.sh
 /core
 /.cproject
+/lib
 /libraries
+/.pio
 /.project
 /Release/
 /.settings
 /sloeber.ino.cpp
 /spec.d
 /.sproject
-
