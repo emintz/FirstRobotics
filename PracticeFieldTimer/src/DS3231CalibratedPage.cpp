@@ -70,7 +70,6 @@ bool DS3231CalibratedPage::handle(
 
   String delta_t_message;
   uint64_t ds3231_unix_time = ds3231.unix_time();
-  time_t ds3231_time_t_unix_time = static_cast<time_t>(ds3231_unix_time);
   auto ds3231_unix_time_string = std::to_string(ds3231_unix_time);
 
   std::string difference;

@@ -24,14 +24,11 @@
 
 #include "Arduino.h"
 #include "CanBus.h"
-#include "CanBusMaps.h"
 #include "CanPayload.h"
 #include "CanEnumerations.h"
 #include "DisplayCommand.h"
 #include "PinAssignments.h"
 #include "TimeChangePayload.h"
-
-static const char *can_failure = "FAIL";
 
 static const OneShotBlinkCommand blink_rj45_green = {
     ._on_time_ms = 50,

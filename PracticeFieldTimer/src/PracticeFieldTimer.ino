@@ -254,16 +254,6 @@ static int32_t reference_time_utc = 0;
 static int32_t auto_field_time_minutes = 0;
 static int32_t manual_field_time_minutes = 0;
 
-static int16_t time_remaining = 0;
-
-/*
- * We want the time display to turn gradually from blue to
- * red as time elapses. We want the display to be completely
- * red for the last minute. setup() will set these constants
- * to enable this.
- */
-static int16_t all_red_period = 60;
-
 static constexpr const char *nvs_namespace = "field-timer";
 
 static DS3231_TimeSource ds3231;
@@ -339,9 +329,9 @@ static void show_machine_characteristics(void) {
   uint8_t mac_address[8];
   memset(mac_address, 0, sizeof(mac_address));
   Serial.printf(
-      "Chip version: %u.\n", efuse_hal_chip_revision());
+      "Chip version: %lu.\n", efuse_hal_chip_revision());
   Serial.printf(
-      "Block version: %u.\n", efuse_hal_blk_version());
+      "Block version: %lu.\n", efuse_hal_blk_version());
   Serial.printf(
       "ESP32 model: %s.\n", ESP.getChipModel());
   Serial.printf(
@@ -572,13 +562,13 @@ static void load_configuration(void) {
   }
 
   Serial.printf(
-      "Reference time: %d UTC\n",
+      "Reference time: %ld UTC\n",
       reference_time_utc);
   Serial.printf(
-      "Field time in automatic mode: %d minutes\n",
+      "Field time in automatic mode: %ld minutes\n",
       auto_field_time_minutes);
   Serial.printf(
-      "Field time in manual mode: %d minutes\n",
+      "Field time in manual mode: %ld minutes\n",
       manual_field_time_minutes);
 }
 
@@ -588,8 +578,6 @@ static void load_configuration(void) {
  * is configured to run.
  */
 static void start_automatic_countdown(void) {
-  int16_t auto_field_time_seconds = 60 * auto_field_time_minutes;
-  int16_t reference_time_utc_seconds = 60 * reference_time_utc;
   continuous_count_down = std::make_unique<ContinuousCountdown>(
       countdown,
       reference_time_utc,

@@ -37,10 +37,10 @@ void SlowBlinkTime::operator() (
       LedPanel &panel) {
   bool running = true;
   show_time(command, panel);
-  if (running = wait(running, command_queue, 450)) {
+  if ((running = wait(running, command_queue, 450))) {
     clear(panel);
   }
-  if (running = wait(running, command_queue, 100)) {
+  if ((running = wait(running, command_queue, 100))) {
     show_time(command, panel);
   }
 }

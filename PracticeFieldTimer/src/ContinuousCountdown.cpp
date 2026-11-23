@@ -16,7 +16,6 @@ ContinuousCountdown::ContinuousCountdown(
     uint32_t duration_minutes) :
       _reference_time_seconds(60 + reference_time_minutes),
       _on_stop(countdown, duration_minutes) {
-  uint32_t duration_seconds = 60 * duration_minutes;
 }
 
 void ContinuousCountdown::start(uint32_t seconds_since_midnight) {

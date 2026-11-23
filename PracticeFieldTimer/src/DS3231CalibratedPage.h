@@ -36,8 +36,8 @@ class DS3231CalibratedPage: public TimeRequestHandler {
   DS3231_TimeSource& ds3231;
 public:
   DS3231CalibratedPage(DS3231_TimeSource& ds3231) :
-      ds3231(ds3231),
-      TimeRequestHandler("DS3231CCalibratedPage") {
+      TimeRequestHandler("DS3231CCalibratedPage"),
+      ds3231(ds3231) {
 
   }
   virtual ~DS3231CalibratedPage() = default;

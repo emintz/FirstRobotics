@@ -36,7 +36,7 @@ void FastBlinkTime::operator() (
   bool running = true;
   while (running) {
     show_time(command, panel);
-    if (running = wait(running, command_queue, 100)) {
+    if ((running = wait(running, command_queue, 100))) {
       clear(panel);
     }
     running = wait(running, command_queue, 25);
