@@ -29,10 +29,8 @@
 #include "CANDisplayCommandPublisher.h"
 #include "CanEnumerations.h"
 #include "Configurator.h"
-#include "ConfigurationCancelledPage.h"
 #include "ContinuousCountdown.h"
 #include "Countdown.h"
-#include <DataTypeCharacteristics.h>
 #include "DataTypes.h"
 #include "DisplayCommand.h"
 #include "DS3231TimeSource.h"
@@ -44,7 +42,6 @@
 #include "PinAssignments.h"
 #include "PressAndHold.h"
 #include "PullQueueHT.h"
-#include <SetBlankValue.h>
 #include "StatusLcd.h"
 #include "TaskPriorities.h"
 #include "TaskWithActionH.h"
@@ -70,7 +67,7 @@
 #define PRESS_TIMEOUT_MS 3000
 #define PRESS_WINDOW_MS 5000
 
-// Pins that contol LEDs.
+// Pins that control LEDs.
 static uint8_t led_pins[] = {
     RED_LED_PIN,
     YELLOW_LED_PIN,
@@ -293,7 +290,7 @@ static WebServer web_server;
 
 static void ripple_pins(void) {
   const uint8_t *current_pin = led_pins;
-  for (int i = 0; i < sizeof(led_pins); ++i) {
+  for (size_t i = 0; i < sizeof(led_pins); ++i) {
     uint8_t pin = *current_pin++;
     digitalWrite(pin, static_cast<uint8_t>(HIGH));
     vTaskDelay(pdMS_TO_TICKS(25));
@@ -590,7 +587,7 @@ static void start_automatic_countdown(void) {
  * should be invoked if and only if manual countdown is configured
  * to run.
  */
-void start_manual_countdown(void) {
+static void start_manual_countdown(void) {
   int16_t manual_field_time_seconds = 60 * manual_field_time_minutes;
   manual_count_down = std::make_unique<ManualCountdown>(
       SET_CONFIGURATION_PIN,
