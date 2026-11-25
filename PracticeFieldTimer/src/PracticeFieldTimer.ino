@@ -36,6 +36,8 @@
 #include "DS3231TimeSource.h"
 #include "ErrorHalt.h"
 #include "Flash32.h"
+#include "LcdAction.h"
+#include "LcdMessage.h"
 #include "ManualCountdown.h"
 #include "OneShotBlink.h"
 #include "PanelServer.h"
@@ -234,8 +236,15 @@ static const IPAddress gateway(192, 168, 251, 1);
 static const IPAddress subnet(255, 255, 255, 0);
 
 // Status LCD support
+static PullQueueHT<LcdMessage> lcd_status_queue(4);
 static LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_COLUMNS, LCD_ROWS);
-static StatusLcd status_display(lcd);
+static LcdAction status_action(lcd_status_queue, lcd);
+static TaskWithActionH lcd_status_task(
+    "lcd_status",
+    STATUS_DISPLAY_PRIORITY,
+    &status_action,
+    4096);
+static StatusLcd status_display(lcd_status_queue);
 
 // Blinkenlights on the RJ-45 sockets
 static PullQueueHT<OneShotBlinkCommand> rj45_blink_queue(3);
@@ -323,8 +332,7 @@ static void start_rj45_blink(void) {
  * Prints chip characteristics -- helpful for debugging.
  */
 static void show_machine_characteristics(void) {
-  uint8_t mac_address[8];
-  memset(mac_address, 0, sizeof(mac_address));
+  uint8_t mac_address[8] = {};
   Serial.printf(
       "Chip version: %lu.\n", efuse_hal_chip_revision());
   Serial.printf(
@@ -400,8 +408,7 @@ static void wifi_on(void) {
 }
 
 static void clear_panel(void) {
-  DisplayCommand command;
-  memset(&command, 0, sizeof(command));
+  DisplayCommand command = {};
   command.command = DisplayCommand::Pattern::FLOOD;
   command_queue.send_message(&command);
 }
@@ -657,6 +664,18 @@ static void init_i2c(void) {
     ErrorHalt::halt_and_catch_fire(
         I2C_STARTUP_FAILED,
         "I2C bus initialization failed.");
+  }
+  uint32_t default_clock = Wire.getClock();
+  Serial.printf("I2C native clock speed is: %lu Hz\n", default_clock);
+  if (!lcd_status_queue.begin()) {
+    ErrorHalt::halt_and_catch_fire(
+      LCD_QUEUE_START_FAILED,
+      "I2C status queue initialization failed.");
+  }
+  if (!lcd_status_task.start()) {
+    ErrorHalt::halt_and_catch_fire(
+      LCD_TASK_START_FAILED,
+      "LCD status task startup failed.");
   }
   scan_i2c_bus();
   lcd.init();

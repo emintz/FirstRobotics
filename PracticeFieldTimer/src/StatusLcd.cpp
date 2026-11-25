@@ -19,6 +19,8 @@
  */
 
 #include "StatusLcd.h"
+#include "BlinkErrorCodes.h"
+#include "ErrorHalt.h"
 
 #include <LiquidCrystal_I2C.h>
 
@@ -27,74 +29,105 @@
 #define CAN_STATUS_ROW 1
 #define MODE_COLUMN 0
 #define MODE_ROW 1
+#define MODE_LENGTH 6
 #define OVERALL_HEALTH_COLUMN 0
 #define OVERALL_HEALTH_LENGTH 20
 #define OVERALL_HEALTH_ROW 3
+#define PRINT_DELAY_MS 2
+#define CURSOR_MOVE_DELAY 5
+#define PRINT_CLOCK_SPEED 500000
 #define TIME_COLUMN 7
 #define TIME_ROW 0
 
-static const char *blanks = "                    ";
-
-
-void StatusLcd::clear_field(uint8_t column, uint8_t row, uint8_t size) {
-  display(column, row, blanks + (column, row, 20 - size));
+void StatusLcd::clear_field(uint8_t column, uint8_t row, uint8_t size) const {
+  LcdMessage clear_field_command;
+  clear_field_command.command = LcdMessage::Command::CLEAR_FIELD;
+  clear_field_command.column = column;
+  clear_field_command.row = row;
+  clear_field_command.size = size;
+  send(clear_field_command);
 }
 
-size_t StatusLcd::display(uint8_t column, uint8_t row, const char *message) {
-//  Serial.printf(" At (%d, %d) displaying >>>%s<<<\n", row, column, message);
-  lcd.setCursor(column, row);
-  return lcd.print(message);
+size_t StatusLcd::display(uint8_t column, uint8_t row, const char *message) const {
+  size_t len = strlen(message);
+  if (20 < len) {
+    len = 20;
+  }
+  LcdMessage display_message;
+  display_message.command = LcdMessage::Command::WRITE_FIELD;
+  display_message.column = column;
+  display_message.row = row;
+  display_message.size = len;
+  strncpy(display_message.contents, message, len);
+  send(display_message);
+  return len;
 }
 
-StatusLcd::StatusLcd(LiquidCrystal_I2C& lcd) :
-    lcd(lcd) {
+void StatusLcd::display_mode(const char *mode_name) const {
+  Serial.printf("Mode: %s.\n", mode_name);
+  (void) display(MODE_COLUMN, MODE_ROW, mode_name);
+}
+
+void StatusLcd::send(const LcdMessage& command) const{
+  if (!status_message_queue_.send_message(&command, 1)) {
+    ErrorHalt::halt_and_catch_fire(
+      LCD_QUEUE_SEND_FAILED,
+      "LCD command send failed.");
+  }
+
+}
+
+StatusLcd::StatusLcd(
+  PullQueueHT<LcdMessage>& status_message_queue) :
+    status_message_queue_(status_message_queue) {
 }
 
 StatusLcd::~StatusLcd() {
 }
 
-void StatusLcd::automatic_mode() {
-  display(MODE_COLUMN, MODE_ROW, "Auto  ");
+void StatusLcd::automatic_mode() const {
+  display_mode("Auto");
 }
 
-void StatusLcd::can_bus_status(const char *message) {
+void StatusLcd::can_bus_status(const char *message) const {
   char buffer[22];
   memset(buffer, '\0', sizeof(buffer));
   strcpy(buffer, "CAN ");
   strncat(buffer, message, CAN_STATUS_LENGTH - 4);
-  clear_field(CAN_STATUS_COLUMN, CAN_STATUS_ROW, CAN_STATUS_LENGTH);
   display(CAN_STATUS_COLUMN, CAN_STATUS_ROW, buffer);
 }
 
-void StatusLcd::clear(void) {
-  lcd.clear();
+void StatusLcd::clear(void) const {
+  LcdMessage clear_command;
+  clear_command.command = LcdMessage::Command::CLEAR_SCREEN;
+  send(clear_command);
 }
 
-void StatusLcd::follow_mode(void) {
-  display(MODE_COLUMN, MODE_ROW, "Follow");
+void StatusLcd::follow_mode(void) const {
+  display_mode("Follow");
 }
 
-void StatusLcd::health(const char *message) {
-  clear_field(OVERALL_HEALTH_COLUMN, OVERALL_HEALTH_ROW, OVERALL_HEALTH_LENGTH);
+void StatusLcd::health(const char *message) const{
   display(OVERALL_HEALTH_COLUMN, OVERALL_HEALTH_ROW, message);
 }
 
-void StatusLcd::manual_mode() {
-  display(MODE_COLUMN, MODE_ROW, "Manual");
+void StatusLcd::manual_mode() const {
+  display_mode("Manual");
 }
 
-void StatusLcd::password(const char *wifi_password) {
+void StatusLcd::password(const char *wifi_password) const {
   size_t password_column = display(0, 1, "PW: ");
   display(password_column, 1, wifi_password);
 }
 
-void StatusLcd::ssid(const char *ssid) {
+void StatusLcd::ssid(const char *ssid) const {
   size_t ssid_column = display(0, 0, "SSID: ");
   display(ssid_column, 0, ssid);
 }
 
-void StatusLcd::time(uint16_t time_remaining) {
+void StatusLcd::time(uint16_t time_remaining) const {
   char formatted_time[10];
+  memset(formatted_time, '\0', sizeof(formatted_time));
   uint16_t seconds = time_remaining % 60;
   uint16_t minutes = time_remaining / 60;
   memset(formatted_time, 0, sizeof(formatted_time));
@@ -107,11 +140,13 @@ void StatusLcd::time(uint16_t time_remaining) {
   formatted_time[0] = minutes
       ? minutes + '0'
       : ' ';
-//  Serial.printf("Current time: %s\n", formatted_time);
   display(TIME_COLUMN, TIME_ROW, formatted_time);
 }
 
-void StatusLcd::url_path(const char *config_ip) {
-  size_t ip_column = display(0, 2, "IP: ");
-  display(ip_column, 2, config_ip);
+void StatusLcd::url_path(const char *config_ip) const{
+  char ip_message[22] = {0};
+  strcpy(ip_message, "IP: ");
+  strncat(ip_message, config_ip, 16);
+  Serial.printf("Config IP message: %s.\n", ip_message);
+  display(0, 2, ip_message);
 }

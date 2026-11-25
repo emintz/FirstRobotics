@@ -26,14 +26,19 @@
 #ifndef STATUSLCD_H_
 #define STATUSLCD_H_
 
-#include "Arduino.h"
+#include <Arduino.h>
+#include "LcdMessage.h"
+
+#include <PullQueueHT.h>
 
 class LiquidCrystal_I2C;
 
 class StatusLcd {
-  LiquidCrystal_I2C& lcd;
+  PullQueueHT<LcdMessage>& status_message_queue_;
 
-  void clear_field(uint8_t column, uint8_t row, uint8_t length);
+  void send(const LcdMessage& message) const;
+
+  void clear_field(uint8_t column, uint8_t row, uint8_t length) const;
 
   /*
    * Display a message starting at a specified column and row.
@@ -51,7 +56,14 @@ class StatusLcd {
    *
    * Returns: the number of characters written
    */
-  size_t display(uint8_t column, uint8_t row, const char *message);
+  size_t display(uint8_t column, uint8_t row, const char *message) const;
+
+  /**
+   * Displays the run mode on the status LCD
+   *
+   * @param mode_name mode name: Augo, Manual, or Follow
+   */
+  void display_mode(const char *mode_name) const;
 
 public:
   /*
@@ -61,19 +73,20 @@ public:
    * Parameters:
    * ----------
    *
-   * Name              Contents
-   * ----------------- ---------------------------------------------------
-   * lcd               Display target, manages the physical liquid crystal
-   *                   display.
+   * Name                     Contents
+   * -------------------- ------------------------------------------
+   * status_message_queue Carries display commands to the
+   *                      status refresh task
    */
-  StatusLcd(LiquidCrystal_I2C& lcd);
+  StatusLcd(
+    PullQueueHT<LcdMessage>& status_message_queue);
   virtual ~StatusLcd();
 
   /*
    * Displays the mode status as "Auto". Invoke this when the timer
    * is configured to run countdown cycles continuously.
    */
-  void automatic_mode(void);
+  void automatic_mode(void) const;
 
   /*
    * Display the CAN bus status.
@@ -83,18 +96,18 @@ public:
    * message           NULL-terminated status message to display. Cannot
    *                   be NULL, and must fit in its allotted space.
    */
-  void can_bus_status(const char *message);
+  void can_bus_status(const char *message) const;
 
   /**
    * Clear the display.
    */
-  void clear(void);
+  void clear(void) const;
 
   /*
    * Display follower status. Invoke this when the timer follows a
    * leader, i.e. a time provider.
    */
-  void follow_mode(void);
+  void follow_mode(void) const;
 
   /*
    * Display the system's general health
@@ -104,14 +117,14 @@ public:
    * message           NULL-terminated status message to display. Cannot
    *                   be NULL, and must fit in its allotted space.
    */
-  void health(const char *message);
+  void health(const char *message) const;
 
   /*
    * Displays the mode status as "manual". Invoke this when the
    * display is configured so that the user has to start each
    * countdown cycle.
    */
-  void manual_mode(void);
+  void manual_mode(void) const;
 
   /*
    * Display the WiFi password during configuration
@@ -121,7 +134,7 @@ public:
    * wifi_password     NULL-terminated WiFi password to display. Cannot
    *                   be NULL, and must fit in its allotted space.
    */
-  void password(const char *wifi_password);
+  void password(const char *wifi_password) const;
 
   /*
    * Display the WiFi access point SSID during configuration.
@@ -131,7 +144,7 @@ public:
    * message           NULL-terminated SSID (network name) to display. Cannot
    *                   be NULL, and must fit in its allotted space.
    */
-  void ssid(const char *ssid);
+  void ssid(const char *ssid) const;
 
   /*
    * Display the number of seconds remaining in the current practice
@@ -145,7 +158,7 @@ public:
    * time_remaining    The number of seconds remaining in the current
    *                   practice session.
    */
-  void time(uint16_t time_remaining);
+  void time(uint16_t time_remaining) const;
 
   /*
    * Display the configuration page URL during configuration. This is
@@ -157,7 +170,7 @@ public:
    *                   to display. Cannot be NULL, and must fit in its
    *                   allotted space.
    */
-  void url_path(const char *config_ip);
+  void url_path(const char *config_ip) const;
 };
 
 #endif /* STATUSLCD_H_ */
