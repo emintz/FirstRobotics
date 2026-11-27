@@ -35,7 +35,7 @@ class LedPanel;
 
 class BaseTime : public DisplayDriver {
 protected:
-  BaseTime() {};
+  BaseTime() = default;
 
   /*
    * Turn off every pixel in the panel

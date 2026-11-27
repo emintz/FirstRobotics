@@ -35,7 +35,7 @@
 #include "PinAssignments.h"
 #include "TimeChangePayload.h"
 
-static const OneShotBlinkCommand blink_rj45_green = {
+static constexpr OneShotBlinkCommand blink_rj45_green = {
     ._on_time_ms = 50,
     ._pin_count = 2,
     ._blink_pin = {RJ45_A_GREEN, RJ45_B_GREEN},

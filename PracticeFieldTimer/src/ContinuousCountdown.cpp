@@ -2,10 +2,8 @@
  * ContinuousCountdown.cpp
  *
  *  Created on: Jul 7, 2026
- *      Author: Eruc Mintz
+ *      Author: Eric Mintz
  */
-
-#include "TimeSource.h"
 
 #include "ContinuousCountdown.h"
 #include "Countdown.h"

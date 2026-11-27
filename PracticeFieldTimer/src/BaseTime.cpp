@@ -114,7 +114,7 @@ bool BaseTime::wait(
     PullQueueHT<DisplayCommand>& queue,
     int milliseconds) {
   if (running) {
-    DisplayCommand dummy_command;
+    DisplayCommand dummy_command{};
     running = !queue.peek_message(&dummy_command, milliseconds);
   }
   return running;

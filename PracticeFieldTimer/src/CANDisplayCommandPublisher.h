@@ -62,7 +62,7 @@ public:
       PullQueueHT<OneShotBlinkCommand>& rj45_blink_queue,
       StatusLcd& status_display);
 
-  virtual ~CANDisplayCommandPublisher() = default;
+  ~CANDisplayCommandPublisher() override = default;
 
   /*
    * Publishes a display command to the CAN bus and show
