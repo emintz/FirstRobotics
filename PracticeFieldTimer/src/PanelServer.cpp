@@ -26,7 +26,6 @@
 #include "Arduino.h"
 #include "DisplayDriver.h"
 #include "DisplayDrivers.h"
-#include "LedPanel.h"
 #include "StatusLcd.h"
 
 #include <memory>
@@ -40,19 +39,15 @@ PanelServer::PanelServer(
         lcd(lcd) {
 }
 
-PanelServer::~PanelServer() {
-}
-
-void PanelServer::run(void) {
-  DisplayCommand display_command;
+void PanelServer::run() {
+  DisplayCommand display_command{};
   bool got_one = true;
   Serial.println("Panel server running.");
   while (true) {
     do {
        got_one = queue.pull_message(&display_command);
     } while (!got_one);
-    DisplayCommand::Pattern pattern =
-        static_cast<DisplayCommand::Pattern>(display_command.command);
+    auto pattern = display_command.command;
     std::shared_ptr<DisplayDriver> driver_ptr =
         DisplayDrivers::drivers[pattern];
     if (driver_ptr) {

@@ -29,18 +29,17 @@
 #include "BaseTime.h"
 
 #include "DisplayCommand.h"
-#include "LedPanel.h"
 #include "PullQueueHT.h"
 
 class FastBlinkTime : public BaseTime {
 public:
   FastBlinkTime();
-  virtual ~FastBlinkTime();
+  ~FastBlinkTime() override;
 
-  virtual void operator() (
+  void operator() (
       PullQueueHT<DisplayCommand> &command_queue,
       const DisplayCommand &command,
-      LedPanel &panel);
+      LedPanel &panel) override;
 };
 
 #endif /* FASTBLINKTIME_H_ */

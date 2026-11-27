@@ -23,11 +23,9 @@
 
 #include "FastBlinkTime.h"
 
-FastBlinkTime::FastBlinkTime() {
-}
+FastBlinkTime::FastBlinkTime() = default;
 
-FastBlinkTime::~FastBlinkTime() {
-}
+FastBlinkTime::~FastBlinkTime() = default;
 
 void FastBlinkTime::operator() (
     PullQueueHT<DisplayCommand> &command_queue,

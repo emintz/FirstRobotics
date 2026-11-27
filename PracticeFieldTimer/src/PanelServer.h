@@ -39,6 +39,14 @@ class PanelServer : public TaskAction {
   PullQueueHT<DisplayCommand> &queue;
   LedPanel &panel;
   StatusLcd& lcd;
+
+protected:
+
+  /*
+   * Service logic.
+   */
+  void run() override;
+
 public:
   /*
    * Constructor
@@ -55,12 +63,7 @@ public:
       PullQueueHT<DisplayCommand> &queue,
       LedPanel &panel,
       StatusLcd& lcd);
-  virtual ~PanelServer();
-
-  /*
-   * Service logic.
-   */
-  virtual void run(void);
+  ~PanelServer() override = default;
 };
 
 #endif /* PANELSERVER_H_ */
