@@ -58,7 +58,7 @@ class CountDownTimer : public TaskAction {
    * Publish the command to the panel service and, if the CAN bus is
    * running, to the CAN bus as well.
    */
-  void publish_command(DisplayCommand& display_command);
+  void publish_command(const DisplayCommand& display_command) const;
 
   /*
    * Create and publish a command to display the time, blinking
@@ -66,7 +66,7 @@ class CountDownTimer : public TaskAction {
    * This is only done during the countdown's end stage, which
    * is set at construction.
    */
-  void show_blink_time(void);
+  void show_blink_time(void) const;
 
   /*
    * Create and publish a command to display the time steadily, i.e.
@@ -74,7 +74,7 @@ class CountDownTimer : public TaskAction {
    * red depending on the remaining time. This is done during all
    * but the end phase of a session, which is set at construction.
    */
-  void show_plain_time(void);
+  void show_plain_time(void) const;
 
 public:
   /*

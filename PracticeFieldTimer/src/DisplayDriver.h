@@ -30,7 +30,7 @@ class LedPanel;
 
 class DisplayDriver {
 public:
-  virtual ~DisplayDriver();
+  virtual ~DisplayDriver() = default;
 
   /*
    * Display control API.

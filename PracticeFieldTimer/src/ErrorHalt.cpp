@@ -37,7 +37,7 @@
 
 #include <map>
 
-std::map<int, const char *> MESSAGES = {
+static std::map<int, const char *> MESSAGES = {
     {WIFI_ACCESS_POINT_SETUP_FAILED, "ERR: WiFi Setup"},
     {WIFI_IP_SETUP_FAILED, "ERR: WiFi IP"},
     {WIFI_SHUTDOWN_FAILED, "ERR: WiFi Shutdown"},
@@ -60,7 +60,7 @@ std::map<int, const char *> MESSAGES = {
 };
 
 ErrorHalt::ErrorHalt() :
-    status_display(NULL) {
+    status_display(nullptr) {
 }
 
 const ErrorHalt ErrorHalt::INSTANCE;
@@ -89,7 +89,7 @@ void ErrorHalt::halt_and_catch_fire(int error_code, const char *message) {
   Serial.println(message);
   Serial.flush();
   blink.start();
-  while (1) {
+  while (true) {
     vTaskDelay(portMAX_DELAY);
   }
 }

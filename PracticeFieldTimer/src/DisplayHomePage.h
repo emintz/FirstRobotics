@@ -32,9 +32,6 @@
 #include <HTTP_Method.h>
 #include <WebServer.h>
 
-#include <map>
-#include <string>
-
 class DS3231_TimeSource;
 
 
@@ -46,9 +43,9 @@ public:
       TimeRequestHandler("DisplayHomePage"),
           ds3231(ds3231) {
   }
-  virtual ~DisplayHomePage() = default;
+  ~DisplayHomePage() override = default;
 
-  virtual bool handle(
+  bool handle(
       WebServer& server, HTTPMethod method, const String& uri) override;
 
 };

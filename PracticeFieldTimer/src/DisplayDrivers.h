@@ -55,7 +55,7 @@ public:
    *                      time in the specified color)
    */
   std::shared_ptr<DisplayDriver> operator[](
-      const DisplayCommand::Pattern pattern);
+      DisplayCommand::Pattern pattern);
 };
 
 #endif /* DISPLAYDRIVERS_H_ */

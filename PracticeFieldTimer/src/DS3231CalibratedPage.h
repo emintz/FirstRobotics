@@ -40,9 +40,9 @@ public:
       ds3231(ds3231) {
 
   }
-  virtual ~DS3231CalibratedPage() = default;
+  ~DS3231CalibratedPage() override = default;
 
-  virtual bool handle(
+  bool handle(
         WebServer& server, HTTPMethod method, const String& uri) override;
 };
 

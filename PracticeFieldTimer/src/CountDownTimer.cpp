@@ -34,16 +34,15 @@ static OneShotBlinkCommand blink_rj45_green = {
     ._blink_pin = {RJ45_A_GREEN, RJ45_B_GREEN},
 };
 
-void CountDownTimer::publish_command(DisplayCommand& display_command) {
+void CountDownTimer::publish_command(const DisplayCommand& display_command) const {
   if (_command_queue.send_message(&display_command)) {
     _rj45_blink_queue.send_message(&blink_rj45_green, 1);
   }
   _command_publisher(display_command);
 }
 
-void CountDownTimer::show_blink_time(void) {
-  DisplayCommand display_command;
-  memset(&display_command, 0, sizeof(display_command));
+void CountDownTimer::show_blink_time() const {
+  DisplayCommand display_command = {};
   display_command.command =
       _fast_blink_start <= _seconds_remaining
       ? DisplayCommand::Pattern::SLOW_BLINK_TIME
@@ -54,9 +53,8 @@ void CountDownTimer::show_blink_time(void) {
   _command_publisher(display_command);
  }
 
-void CountDownTimer::show_plain_time(void) {
-  DisplayCommand display_command;
-  memset(&display_command, 0, sizeof(display_command));
+void CountDownTimer::show_plain_time() const {
+  DisplayCommand display_command = {};
   display_command.command = DisplayCommand::Pattern::PLAIN_TIME;
   display_command.time_in_seconds = _seconds_remaining;
 
@@ -95,10 +93,9 @@ CountDownTimer::CountDownTimer(
         _command_publisher(command_publisher) {
 }
 
-CountDownTimer::~CountDownTimer() {
-}
+CountDownTimer::~CountDownTimer() = default;
 
-void CountDownTimer::run(void) {
+void CountDownTimer::run() {
   while (true) {
     wait_for_notification();
     if (_seconds_remaining < _slow_blink_start) {

@@ -47,7 +47,7 @@ public:
   /*
    * Place holder destructor.
    */
-  virtual ~DS3231_TimeSource();
+  ~DS3231_TimeSource() override;
 
   /*
    * Connects to the DS3231. Connects to the default I2C bus (the
@@ -56,16 +56,16 @@ public:
    *
    * Returns: true if and only if the DS3231 is connected.
    */
-  virtual bool begin(void) override;
+  bool begin() override;
 
   /*
    * Provides the current time as seconds since midnight UTC.
    */
-  virtual uint64_t seconds_since_midnight(void) override;
+  uint64_t seconds_since_midnight() override;
 
-  virtual bool set_date_and_time(uint64_t unix_timestamp);
+  bool set_date_and_time(uint64_t unix_timestamp) override;
 
-  virtual uint64_t unix_time(void) override;
+  uint64_t unix_time() override;
 };
 
 #endif /* DS3231TIMESOURCE_H_ */
