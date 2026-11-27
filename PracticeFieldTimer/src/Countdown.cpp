@@ -30,39 +30,38 @@
 
 #include "StateTransitionTable.h"
 
-Countdown::CommandMessage Countdown::_on_tick_command = {
-  ._command = Command::TICK,
-  ._duration = 0,
-  ._on_stop = NULL,
+Countdown::CommandMessage Countdown::on_tick_command_ = {
+  .command_ = Command::TICK,
+  .duration_ = 0,
+  .on_stop_ = nullptr,
 };
 
 Countdown::Countdown(
     uint8_t sqw_pin,
     uint16_t slow_blink_seconds,
     uint16_t fast_blink_seconds,
-    PullQueueHT<DisplayCommand>& display_command_queue,
-    DisplayCommandPublisher& command_to_can_bus) :
-      _on_stop(NULL),
-      _slow_blink_seconds(slow_blink_seconds),
-      _fast_blink_seconds(fast_blink_seconds),
-      _slow_blink_start_time(_slow_blink_seconds + _fast_blink_seconds),
-      _display_command_queue(display_command_queue),
-      _command_to_can_bus(command_to_can_bus),
-      _internal_event_queue(3),
-      _on_tick(_internal_event_queue),
-      _sqw_detector(
+    PullQueueHT<DisplayCommand>& display_command_queue) :
+      on_stop_(nullptr),
+      slow_blink_seconds_(slow_blink_seconds),
+      fast_blink_seconds_(fast_blink_seconds),
+      slow_blink_start_time_(slow_blink_seconds_ + fast_blink_seconds_),
+      display_command_queue_(display_command_queue),
+      internal_event_queue_(3),
+      on_tick_(internal_event_queue_),
+      sqw_detector_(
           sqw_pin,
           GpioChangeType::HIGH_TO_LOW,
-          &_on_tick),
-      _duration(0),
-      _color_change_halfway_mark(0),
-      _time_remaining(0) {
+          &on_tick_),
+      duration_(0),
+      color_change_halfway_mark_(0),
+      time_remaining_(0),
+      display_command_publisher_(nullptr) {
 }
 
 StateTransitionTable<Countdown::Command, Countdown::State>
     Countdown::_transition_table(State::IGNORING_EVENT);
 
-void Countdown::begin(void) {
+void Countdown::begin() {
   _transition_table
       .add(State::CREATED, Command::START, State::STARTING)
       .add(State::CREATED, Command::START_AFTER_DELAY, State::STARTING_WITH_DELAY)
@@ -100,54 +99,53 @@ void Countdown::begin(void) {
       ;
 }
 
-void Countdown::cancel_count(void) {
-  _sqw_detector.stop();
-  _internal_event_queue.reset();
-  DisplayCommand display_command;
-  memset(&display_command, '\0', sizeof(display_command));
+void Countdown::cancel_count() {
+  sqw_detector_.stop();
+  internal_event_queue_.reset();
+  DisplayCommand display_command = {};
   display_command.command = DisplayCommand::Pattern::FLOOD;
-  _display_command_queue.send_message(&display_command, 1);
-  _duration = 0;
-  _color_change_halfway_mark = 0;
-  _time_remaining = 0;
-  _on_stop = NULL;
+  display_command_queue_.send_message(&display_command, 1);
+  duration_ = 0;
+  color_change_halfway_mark_ = 0;
+  time_remaining_ = 0;
+  on_stop_ = nullptr;
   vTaskDelay(1);  // So lower priority tasks can respond.
   digitalWrite(YELLOW_LED_PIN, LOW);
 }
 
-DisplayCommand::Pattern Countdown::display_pattern(void) {
-  if (_slow_blink_start_time < _time_remaining) {
+DisplayCommand::Pattern Countdown::display_pattern() const {
+  if (slow_blink_start_time_ < time_remaining_) {
     return DisplayCommand::Pattern::PLAIN_TIME;
-  } else if (_fast_blink_seconds < _time_remaining) {
+  } else if (fast_blink_seconds_ < time_remaining_) {
     return DisplayCommand::Pattern::SLOW_BLINK_TIME;
   }
   return DisplayCommand::Pattern::FAST_BLINK_TIME;
 }
 
-void Countdown::display_remaining_time(void) {
-  DisplayCommand command;
-  memset(&command, '\0', sizeof(DisplayCommand));
-  command.time_in_seconds = _time_remaining;
+void Countdown::display_remaining_time() const
+{
+  DisplayCommand command = {};
+  command.time_in_seconds = time_remaining_;
   foreground(command);
   command.command = display_pattern();
-  _display_command_queue.send_message(&command, 1);
-  _command_to_can_bus(command);
+  display_command_queue_.send_message(&command, 1);
+  display_command_publisher_->operator()(command);
 }
 
-void Countdown::foreground(DisplayCommand& display_command) {
-  if (_time_remaining <= _slow_blink_start_time) {
+void Countdown::foreground(DisplayCommand& display_command) const {
+  if (time_remaining_ <= slow_blink_start_time_) {
     display_command.foreground.red = 63;
   } else {
-    uint16_t color_change_time = _time_remaining - _slow_blink_start_time;
-    if (color_change_time <= _color_change_halfway_mark) {
+    uint16_t color_change_time = time_remaining_ - slow_blink_start_time_;
+    if (color_change_time <= color_change_halfway_mark_) {
       int green_intensity =
-          (63 * color_change_time) / _color_change_halfway_mark;
+          (63 * color_change_time) / color_change_halfway_mark_;
       display_command.foreground.green = green_intensity;
       display_command.foreground.red = 63 - display_command.foreground.green;
     } else {
-      color_change_time -= _color_change_halfway_mark;
+      color_change_time -= color_change_halfway_mark_;
       int blue_intensity =
-          (63 * color_change_time) / _color_change_halfway_mark;
+          (63 * color_change_time) / color_change_halfway_mark_;
       display_command.foreground.blue = blue_intensity;
       display_command.foreground.green = 63 - display_command.foreground.blue;
     }
@@ -156,54 +154,54 @@ void Countdown::foreground(DisplayCommand& display_command) {
 
 void Countdown::handle_delayed_start(const CommandMessage& command) {
   vTaskDelay(pdMS_TO_TICKS(20));
-  _internal_event_queue.reset();
+  internal_event_queue_.reset();
   handle_start(command);
 }
 
 void Countdown::handle_start(const CommandMessage& command) {
   digitalWrite(YELLOW_LED_PIN, HIGH);
-  _duration = command._duration;
-  _time_remaining = command._duration;
-  _on_stop = command._on_stop;
-  _color_change_halfway_mark = (_duration - _slow_blink_start_time) / 2;
+  duration_ = command.duration_;
+  time_remaining_ = command.duration_;
+  on_stop_ = command.on_stop_;
+  color_change_halfway_mark_ = (duration_ - slow_blink_start_time_) / 2;
   display_remaining_time();
-  _sqw_detector.start();
+  sqw_detector_.start();
 }
 
-void Countdown::handle_stop(void) {
-  _internal_event_queue.reset();
-  _sqw_detector.stop();
-  if (_on_stop) {
-    _on_stop->apply();
+void Countdown::handle_stop() {
+  internal_event_queue_.reset();
+  sqw_detector_.stop();
+  if (on_stop_) {
+    on_stop_->apply();
   }
-  _duration = 0;
-  _color_change_halfway_mark = 0;
-  _time_remaining = 0;
-  _on_stop = NULL;
+  duration_ = 0;
+  color_change_halfway_mark_ = 0;
+  time_remaining_ = 0;
+  on_stop_ = nullptr;
   vTaskDelay(1);  // So lower priority tasks can respond.
   digitalWrite(YELLOW_LED_PIN, LOW);
 }
 
-void Countdown::handle_tick(void) {
-  if (0 == _time_remaining) {
-    CommandMessage stop_counting;
+void Countdown::handle_tick() {
+  if (0 == time_remaining_) {
+    CommandMessage stop_counting{};
     memset(&stop_counting, '\0', sizeof(stop_counting));
-    stop_counting._command = Countdown::Command::STOP;
-    _internal_event_queue.send_message_to_front(&stop_counting, 1);
+    stop_counting.command_ = Countdown::Command::STOP;
+    internal_event_queue_.send_message_to_front(&stop_counting, 1);
   } else {
-    --_time_remaining;
+    --time_remaining_;
     display_remaining_time();
   }
 }
 
-void Countdown::run(void) {
+void Countdown::run() {
   start_internal_queue();
   State state = State::CREATED;
-  CommandMessage display_command;
+  CommandMessage display_command{};
   for (;;) {
-    if (_internal_event_queue.pull_message(&display_command)) {
+    if (internal_event_queue_.pull_message(&display_command)) {
       auto maybe_new_state = _transition_table.to(
-          state, display_command._command);
+          state, display_command.command_);
       if (State::IGNORING_EVENT != maybe_new_state) {
         switch (state = maybe_new_state) {
         case State::CREATED:
@@ -241,8 +239,8 @@ void Countdown::run(void) {
   }
 }
 
-void Countdown::start_internal_queue(void) {
-  if (!_internal_event_queue.begin()) {
+void Countdown::start_internal_queue() {
+  if (!internal_event_queue_.begin()) {
     ErrorHalt::halt_and_catch_fire(
         COUNTDOWN_INTERNAL_QUEUE_FAILURE,
         "Countdown event queue startup failed.");
@@ -250,40 +248,40 @@ void Countdown::start_internal_queue(void) {
 }
 
 bool Countdown::start(uint16_t duration_in_seconds, VoidFunction *on_stop) {
-  CommandMessage start_countdown;
+  CommandMessage start_countdown{};
   memset(&start_countdown, '\0', sizeof(start_countdown));
-  start_countdown._command = Command::START;
-  start_countdown._duration = duration_in_seconds;
-  start_countdown._on_stop = on_stop;
-  return _internal_event_queue.send_message(&start_countdown, 1);
+  start_countdown.command_ = Command::START;
+  start_countdown.duration_ = duration_in_seconds;
+  start_countdown.on_stop_ = on_stop;
+  return internal_event_queue_.send_message(&start_countdown, 1);
 }
 
 bool Countdown::start_after_delay(uint16_t duration_in_seconds, VoidFunction *on_stop) {
-  CommandMessage start_countdown;
+  CommandMessage start_countdown{};
   memset(&start_countdown, '\0', sizeof(start_countdown));
-  start_countdown._command = Command::START_AFTER_DELAY;
-  start_countdown._duration = duration_in_seconds;
-  start_countdown._on_stop = on_stop;
-  return _internal_event_queue.send_message(&start_countdown, 1);
+  start_countdown.command_ = Command::START_AFTER_DELAY;
+  start_countdown.duration_ = duration_in_seconds;
+  start_countdown.on_stop_ = on_stop;
+  return internal_event_queue_.send_message(&start_countdown, 1);
 }
 
 bool Countdown::start_from_ISR(
     uint16_t duration_in_seconds, VoidFunction *on_stop) {
-  CommandMessage start_countdown;
+  CommandMessage start_countdown{};
   memset(&start_countdown, '\0', sizeof(start_countdown));
-  start_countdown._command = Command::START;
-  start_countdown._duration = duration_in_seconds;
-  start_countdown._on_stop = on_stop;
-  return _internal_event_queue.send_message_from_ISR(&start_countdown);
+  start_countdown.command_ = Command::START;
+  start_countdown.duration_ = duration_in_seconds;
+  start_countdown.on_stop_ = on_stop;
+  return internal_event_queue_.send_message_from_ISR(&start_countdown);
 }
 
 bool Countdown::start_after_delay_from_ISR(
     uint16_t duration_in_seconds, VoidFunction *on_stop) {
-  CommandMessage start_countdown;
+  CommandMessage start_countdown{};
   memset(&start_countdown, '\0', sizeof(start_countdown));
-  start_countdown._command = Command::START_AFTER_DELAY;
-  start_countdown._duration = duration_in_seconds;
-  start_countdown._on_stop = on_stop;
-  return _internal_event_queue.send_message_from_ISR(&start_countdown);
+  start_countdown.command_ = Command::START_AFTER_DELAY;
+  start_countdown.duration_ = duration_in_seconds;
+  start_countdown.on_stop_ = on_stop;
+  return internal_event_queue_.send_message_from_ISR(&start_countdown);
 }
 

@@ -26,11 +26,15 @@
 #ifndef DISPLAYCOMMANDPUBLISHER_H_
 #define DISPLAYCOMMANDPUBLISHER_H_
 
-class DisplayCommand;
+struct DisplayCommand;
 
 class DisplayCommandPublisher {
+
 public:
-  virtual bool operator()(const DisplayCommand& command_to_publish) = 0;
+  DisplayCommandPublisher() = default;
+  virtual ~DisplayCommandPublisher() = default;
+
+  virtual bool operator() (const DisplayCommand& command_to_publish) = 0;
 };
 
 #endif /* DISPLAYCOMMANDPUBLISHER_H_ */

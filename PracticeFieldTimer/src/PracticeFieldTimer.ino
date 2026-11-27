@@ -50,6 +50,7 @@
 #include "TextDisplay.h"
 #include "TimeChangeHandler.h"
 #include "TimeRequestHandlers.h"
+#include "VacuousDisplayCommandPublisher.h"
 #include "WebServer.h"
 #include "WS2812B8x32vertical.h"
 
@@ -275,15 +276,12 @@ static TimeChangeHandler incoming_time_change_handler(
     command_queue,
     rj45_blink_queue);
 static CanBus can_bus(CAN_RECEIVE_PIN, CAN_TRANSMIT_PIN, CanBusSpeed::BPS_100K);
-static CANDisplayCommandPublisher to_can_bus(
-    can_bus, rj45_blink_queue, status_display);
 
 static Countdown countdown(
     SQUARE_WAVE_PIN,
     30,
     30,
-    command_queue,
-    to_can_bus
+    command_queue
   );
 static TaskWithActionH countdown_task(
     "Countdown",
@@ -610,7 +608,7 @@ static void start_manual_countdown(void) {
  * to run continuously, i.e. if MANUAL_ENABLE_NOT_PIN is HIGH.
  * Note that the caller must ensure that FOLLOWER_NOT_PIN is
  * HIGH before invoking this function. Since the to MUST be
- * connected by a SPDT ON-OFF-ON switch, the harware should
+ * connected by a SPDT ON-OFF-ON switch, the hardware should
  * enforce this.
  */
 static void maybe_start_countdown(void) {
@@ -652,8 +650,19 @@ static void start_can_bus(void) {
         "Can bus startup failed.");
     status_display.can_bus_status("Start Failed");
   }
+  countdown.set_command_publisher(std::make_unique<CANDisplayCommandPublisher>(
+    can_bus, rj45_blink_queue, status_display));
   status_display.can_bus_status("OK");
   Serial.println("CAN bus is running.");
+}
+
+/**
+ * Do not start the CAN bus and bypass time change publication.
+ */
+void bypass_can_bus_use(){
+  countdown.set_command_publisher(std::make_unique<VacuousDisplayCommandPublisher>());
+  status_display.can_bus_status("DISABLED");
+  Serial.println("CAN bus is disabled.");
 }
 
 /*
@@ -778,6 +787,8 @@ void setup() {
 
   if (digitalRead(CAN_ENABLE_NOT_PIN) == LOW) {
     start_can_bus();
+  } else {
+    bypass_can_bus_use();
   }
 
   vTaskDelay(pdMS_TO_TICKS(2000));

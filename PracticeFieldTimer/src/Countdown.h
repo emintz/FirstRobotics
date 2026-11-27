@@ -37,20 +37,19 @@
 
 #include <GpioChangeDetector.h>
 #include <PullQueueHT.h>
-#include <StateTransitionTable.h>
 #include <TaskAction.h>
 #include <VoidFunction.h>
 
 #include <memory>
 
+#include "fl/stl/unique_ptr.h"
+
 class Countdown : public TaskAction {
-
-
   /**
    * Commands, a.k.a. event types. Directs countdown
    * behavior.
    */
-  typedef enum class _Command {
+  typedef enum class Command_ {
     /**
      * @brief Start a countdown immediately
      *
@@ -79,21 +78,21 @@ class Countdown : public TaskAction {
     /**
      * What to do.
      */
-    Command _command;
+    Command command_;
     /**
      * How long to do it -- only relevant to START
      */
-    uint16_t _duration;
+    uint16_t duration_;
     /**
      * Whom to notify when done -- only relevant to START.
      */
-    VoidFunction *_on_stop;
+    VoidFunction *on_stop_;
   };
 
   /**
    * States. State entry is bound to an action.
    */
-  typedef enum class _State {
+  typedef enum class State_ {
     /**
      * Initial state. Does nothing on entry.
      */
@@ -145,58 +144,58 @@ class Countdown : public TaskAction {
     IGNORING_EVENT,
   } State;
 
-  static CommandMessage _on_tick_command;
+  static CommandMessage on_tick_command_;
 
   class OnTick : public VoidFunction {
-    PullQueueHT<CommandMessage>& _countdown_command_queue;
+    PullQueueHT<CommandMessage>& countdown_command_queue_;
   public:
     OnTick(PullQueueHT<CommandMessage>& countdown_command_queue) :
-        _countdown_command_queue(countdown_command_queue) {
+        countdown_command_queue_(countdown_command_queue) {
     }
 
-    virtual void apply(void) override {
-      _countdown_command_queue.send_message(&_on_tick_command, 1);
+    void apply() override {
+      countdown_command_queue_.send_message(&on_tick_command_, 1);
     }
   };
 
   static StateTransitionTable<Command, State> _transition_table;
 
-  VoidFunction *_on_stop;
-  const uint16_t _slow_blink_seconds;
-  const uint16_t _fast_blink_seconds;
-  const uint16_t _slow_blink_start_time;
-  PullQueueHT<DisplayCommand>& _display_command_queue;
-  DisplayCommandPublisher& _command_to_can_bus;
-  PullQueueHT<CommandMessage> _internal_event_queue;
-  OnTick _on_tick;
-  GpioChangeDetector _sqw_detector;
-  uint16_t _duration;
-  uint16_t _color_change_halfway_mark;
-  uint16_t _time_remaining;
+  VoidFunction *on_stop_;
+  const uint16_t slow_blink_seconds_;
+  const uint16_t fast_blink_seconds_;
+  const uint16_t slow_blink_start_time_;
+  PullQueueHT<DisplayCommand>& display_command_queue_;
+  PullQueueHT<CommandMessage> internal_event_queue_;
+  OnTick on_tick_;
+  GpioChangeDetector sqw_detector_;
+  uint16_t duration_;
+  uint16_t color_change_halfway_mark_;
+  uint16_t time_remaining_;
+  std::unique_ptr<DisplayCommandPublisher> display_command_publisher_;
 
   /**
    * Ignominiously cancels a countdown and clears the display.
    * Cancellation is immediate and does not invoke _on_stop.
    * Used to stop a count during a restart.
    */
-  void cancel_count(void);
+  void cancel_count();
 
   /**
    * Sets the display pattern -- solid, slow blink, or fast blink --
    * based on the time remaining.
    */
-  DisplayCommand::Pattern display_pattern(void);
+  [[nodiscard]] DisplayCommand::Pattern display_pattern() const;
 
   /**
    * Display the remaining time.
    */
-  void display_remaining_time(void);
+  void display_remaining_time() const;
 
   /**
    * Sets the foreground color based on time remaining. The
    * caller must initialize all intensities to 0.
    */
-  void foreground(DisplayCommand& display_command);
+  void foreground(DisplayCommand& display_command) const;
 
   /**
    * Waits for the system to settle (read: start switch to
@@ -213,19 +212,26 @@ class Countdown : public TaskAction {
    * Handle a stop event. Stop the GPIO change detector, invoke the
    * notification function, and clear the duration.
    */
-  void handle_stop(void);
+  void handle_stop();
 
   /**
    * Handle a tick. Decrement and display the time remaining. Stop
    * when expires.
    */
-  void handle_tick(void);
+  void handle_tick();
 
   /**
    * Starts the internal queue. Prints an error message and hangs
-   * if startup fails. TODO: better benavior!
+   * if startup fails. TODO: better behavior!
    */
-  void start_internal_queue(void);
+  void start_internal_queue();
+
+protected:
+
+  /**
+   * Task logic.
+   */
+  void run() override;
 
 public:
   /**
@@ -251,15 +257,14 @@ public:
       uint8_t sqw_pin,
       uint16_t slow_blink_seconds,
       uint16_t fast_blink_seconds,
-      PullQueueHT<DisplayCommand>& display_command_queue,
-      DisplayCommandPublisher& command_to_can_bus
+      PullQueueHT<DisplayCommand>& display_command_queue
       );
   /**
    * Forbid copying
    */
   Countdown(Countdown&) = delete;
 
-  virtual ~Countdown() = default;
+  ~Countdown() override = default;
 
   /**
    * Forbid assignment.
@@ -270,19 +275,74 @@ public:
    * Global initializer. Be sure to invoke this before creating
    * an instance.
    */
-  static void begin(void);
+  static void begin();
+
+  void set_command_publisher(
+    std::unique_ptr<DisplayCommandPublisher> publisher) {
+    display_command_publisher_ = std::move(publisher);
+  }
 
   /**
-   * Task logic.
+   * Starts a countdown immediately. Invoke ONLY from application
+   * code.
+   *
+   * @param duration_in_seconds duration of the countdown in
+   *        seconds, typically 720 (12 minutes) in automatic
+   *        mode and 90 (i5 minutes) in manual mode.
+   * @param on_stop invoked when the countdown stops. Provide
+   *        a vacuous implementation for manual mode, and an
+   *        implementation that restarts the countdown in
+   *        auto mode.
+   * @return true if the countdown started successfully, false otherwise
    */
-  virtual void run(void) override;
-
   bool start(uint16_t duration_in_seconds, VoidFunction *on_stop);
 
+  /**
+   * Starts a countdown after waiting a tick. Used to start a countdown
+   * in response to a start/cfg button press. The delay allows for
+   * button bounce. Invoke ONLY from application code.
+   *
+  * @param duration_in_seconds duration of the countdown in
+   *        seconds, typically 720 (12 minutes) in automatic
+   *        mode and 90 (i5 minutes) in manual mode.
+   * @param on_stop invoked when the countdown stops. Provide
+   *        a vacuous implementation for manual mode, and an
+   *        implementation that restarts the countdown in
+   *        auto mode.
+   * @return true if the countdown started successfully, false otherwise
+   */
   bool start_after_delay(uint16_t duration_in_seconds, VoidFunction *on_stop);
 
+  /**
+   * Starts a countdown immediately. Invoke ONLY from an interrupt
+   * service routing.
+   *
+   * @param duration_in_seconds duration of the countdown in
+   *        seconds, typically 720 (12 minutes) in automatic
+   *        mode and 90 (i5 minutes) in manual mode.
+   * @param on_stop invoked when the countdown stops. Provide
+   *        a vacuous implementation for manual mode, and an
+   *        implementation that restarts the countdown in
+   *        auto mode.
+   * @return true if the countdown started successfully, false otherwise
+   */
   bool start_from_ISR(uint16_t duration_in_seconds, VoidFunction *on_stop);
 
+  /**
+   * Starts a countdown after waiting a tick. Used to start a countdown
+   * in response to a start/cfg button press. The delay allows for
+   * button bounce. Invoke ONLY from an interrupt service
+   * routine..
+   *
+  * @param duration_in_seconds duration of the countdown in
+   *        seconds, typically 720 (12 minutes) in automatic
+   *        mode and 90 (i5 minutes) in manual mode.
+   * @param on_stop invoked when the countdown stops. Provide
+   *        a vacuous implementation for manual mode, and an
+   *        implementation that restarts the countdown in
+   *        auto mode.
+   * @return true if the countdown started successfully, false otherwise
+   */
   bool start_after_delay_from_ISR(uint16_t duration_in_seconds, VoidFunction *on_stop);
 };
 

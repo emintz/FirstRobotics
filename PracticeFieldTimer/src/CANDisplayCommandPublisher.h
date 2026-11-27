@@ -6,6 +6,7 @@
  *
  * Sends the display time to followers. Only the
  * leading countdown timer invoke this class.
+ *
  * Copyright (C) 2025 Eric Mintz
  * All Rights Reserved
  *
@@ -33,14 +34,14 @@
 #include <PullQueueHT.h>
 
 class CanBus;
-class DisplayCommand;
+struct DisplayCommand;
 
 class CANDisplayCommandPublisher final :
     public DisplayCommandPublisher {
 
-  CanBus& _can_bus;
-  PullQueueHT<OneShotBlinkCommand>& _rj45_blink_queue;
-  StatusLcd& _status_display;
+  CanBus& can_bus_;
+  PullQueueHT<OneShotBlinkCommand>& rj45_blink_queue_;
+  StatusLcd& status_display_;
 public:
 
   /*
@@ -61,13 +62,15 @@ public:
       PullQueueHT<OneShotBlinkCommand>& rj45_blink_queue,
       StatusLcd& status_display);
 
+  virtual ~CANDisplayCommandPublisher() = default;
+
   /*
    * Publishes a display command to the CAN bus and show
    * publication status on LEDs. When publication succeeds,
    * turn off the red LED and illuminate the green. When
    * publication fails, do the opposite.
    */
-  virtual bool operator()(const DisplayCommand& command);
+  bool operator()(const DisplayCommand& command) override;
 };
 
 #endif /* CANDISPLAYCOMMANDPUBLISHER_H_ */

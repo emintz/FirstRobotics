@@ -4,7 +4,8 @@
  *  Created on: Jun 9, 2025
  *      Author: Eric Mintz
  *
- * A vacuous (do-nothing) DisplayCommand publisher.
+ * A time change publisher that posts time changes to the local
+ * LCD only. Use this class when  CAN is disabled.
  *
  * Copyright (C) 2025 Eric Mintz
  * All Rights Reserved
@@ -28,12 +29,17 @@
 
 #include "DisplayCommandPublisher.h"
 
+struct DisplayCommand;
+
 class VacuousDisplayCommandPublisher final :
     public DisplayCommandPublisher {
-public:
-  virtual ~VacuousDisplayCommandPublisher();
 
-  virtual bool operator()(const DisplayCommand& command_to_publish);
+public:
+  VacuousDisplayCommandPublisher() = default;
+
+  virtual ~VacuousDisplayCommandPublisher() = default;
+
+  bool operator()(const DisplayCommand& command_to_publish) override;
 };
 
 #endif /* VACUOUSDISPLAYCOMMANDPUBLISHER_H_ */

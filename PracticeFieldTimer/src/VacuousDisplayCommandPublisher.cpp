@@ -23,9 +23,6 @@
 
 #include "VacuousDisplayCommandPublisher.h"
 
-VacuousDisplayCommandPublisher::~VacuousDisplayCommandPublisher() {
-}
-
 bool VacuousDisplayCommandPublisher::operator()(
     const DisplayCommand& command_to_publish) {
   return true;
