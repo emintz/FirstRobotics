@@ -62,11 +62,7 @@ bool CANDisplayCommandPublisher::operator()(const DisplayCommand& command) {
   time_display_message.set_id(static_cast<int>(command.command))
       .set_data(time_change);
   CanBusOpStatus send_status = can_bus_.transmit(time_display_message, 2);
-  // This is a hack. For some reason, we need to let the CAN bus settle
-  // before we can display its status on the LCD. Danged if I know why,
-  // but there it is.
   const char *can_status_message = "";
-  vTaskDelay(pdMS_TO_TICKS(15));
   if (CanBusOpStatus::SUCCEEDED == send_status) {
     rj45_blink_queue_.send_message(&blink_rj45_green, 1);
     can_status_message = "OK";
