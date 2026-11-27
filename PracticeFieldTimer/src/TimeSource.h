@@ -32,7 +32,7 @@
 class TimeSource {
 
 protected:
-  TimeSource(void) {}
+  TimeSource(void) = default;
 public:
   virtual ~TimeSource() = default;
 
@@ -42,17 +42,17 @@ public:
    *
    * Returns: true if connect succeeded, false otherwise.
    */
-  virtual bool begin(void) = 0;
+  virtual bool begin() = 0;
 
   /*
    * Returns the number of seconds since the most recent midnight.
    * The results will be in [0 .. 86400).
    */
-  virtual uint64_t seconds_since_midnight(void) = 0;
+  virtual uint64_t seconds_since_midnight() = 0;
 
   virtual bool set_date_and_time(uint64_t unix_timestamp) = 0;
 
-  virtual uint64_t unix_time(void) = 0;
+  virtual uint64_t unix_time() = 0;
 };
 
 #endif /* TIMESOURCE_H_ */

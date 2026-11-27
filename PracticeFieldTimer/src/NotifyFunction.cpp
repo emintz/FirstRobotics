@@ -30,9 +30,6 @@ NotifyFunction::NotifyFunction(
         task(task) {
 }
 
-NotifyFunction::~NotifyFunction() {
-}
-
-void NotifyFunction::apply(void) {
+void NotifyFunction::apply() {
   task->notify();
 }

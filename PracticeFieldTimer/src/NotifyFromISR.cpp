@@ -29,9 +29,6 @@ NotifyFromISR::NotifyFromISR(BaseTaskWithAction *task) :
     task(task) {
 }
 
-NotifyFromISR::~NotifyFromISR() {
-}
-
-void NotifyFromISR::apply(void) {
+void NotifyFromISR::apply() {
   task->notify_from_isr();
 }

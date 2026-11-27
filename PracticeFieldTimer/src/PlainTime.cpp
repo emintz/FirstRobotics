@@ -24,17 +24,7 @@
 #include "PlainTime.h"
 
 #include "DisplayCommand.h"
-#include "FastLED.h"
-#include "Font.h"
-#include "LedPanel.h"
-#include "PinAssignments.h"
 #include "PullQueueHT.h"
-
-PlainTime::PlainTime() {
-}
-
-PlainTime::~PlainTime() {
-}
 
 void PlainTime::operator ()(
     PullQueueHT<DisplayCommand> &command_queue,

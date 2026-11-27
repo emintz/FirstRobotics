@@ -37,7 +37,7 @@ class VacuousDisplayCommandPublisher final :
 public:
   VacuousDisplayCommandPublisher() = default;
 
-  virtual ~VacuousDisplayCommandPublisher() = default;
+  ~VacuousDisplayCommandPublisher() override = default;
 
   bool operator()(const DisplayCommand& command_to_publish) override;
 };

@@ -43,9 +43,9 @@ public:
       _command_queue(command_queue) {
   }
 
-  virtual ~ShowNoTimeRemaining() = default;
+  ~ShowNoTimeRemaining() override = default;
 
-  virtual void apply(void) override;
+  void apply() override;
 };
 
 #endif /* SHOWNOTIMEREMAINING_H_ */

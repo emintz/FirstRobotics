@@ -30,7 +30,7 @@
 
 class VacuousVoidFunction : public VoidFunction {
 public:
-  virtual void apply(void) override {}
+  void apply(void) override {}
 };
 
 #endif /* VACUOUSVOIDFUNCTION_H_ */

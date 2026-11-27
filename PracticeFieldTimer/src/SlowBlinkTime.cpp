@@ -23,14 +23,6 @@
 
 #include "SlowBlinkTime.h"
 
-#include "LedPanel.h"
-
-SlowBlinkTime::SlowBlinkTime() {
-}
-
-SlowBlinkTime::~SlowBlinkTime() {
-}
-
 void SlowBlinkTime::operator() (
       PullQueueHT<DisplayCommand> &command_queue,
       const DisplayCommand &command,

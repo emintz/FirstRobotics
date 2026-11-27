@@ -28,7 +28,7 @@
 #include "PinAssignments.h"
 #include "TimeChangePayload.h"
 
-static const OneShotBlinkCommand blink_rj45_yellow = {
+static constexpr OneShotBlinkCommand blink_rj45_yellow = {
   ._on_time_ms = 50,
   ._pin_count = 2,
   ._blink_pin = {RJ45_A_YELLOW, RJ45_B_YELLOW},
@@ -41,16 +41,13 @@ TimeChangeHandler::TimeChangeHandler(
     _rj45_blink_queue(rj45_blink_queue) {
 }
 
-TimeChangeHandler::~TimeChangeHandler() {
-}
-
 void TimeChangeHandler::operator()(
     CanBus& bus, CanPayload& payload) {
   TimeChangePayload time_change_payload;
   memset(&time_change_payload, 0, sizeof(time_change_payload));
   payload.copy_payload_to(
       &time_change_payload);
-  DisplayCommand send_to_panel;
+  DisplayCommand send_to_panel{};
   _rj45_blink_queue.send_message(&blink_rj45_yellow, 1);
   memset(&send_to_panel, 0, sizeof(send_to_panel));
   send_to_panel.command = static_cast<DisplayCommand::Pattern>(

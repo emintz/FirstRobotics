@@ -46,12 +46,12 @@ public:
    */
   NotifyFunction(
       BaseTaskWithAction *task);
-  virtual ~NotifyFunction();
+  ~NotifyFunction() override = default;
 
   /*
    * Notifies the task that was bound during construction.
    */
-  virtual void apply(void) override;
+  void apply() override;
 };
 
 #endif /* NOTIFYFUNCTION_H_ */

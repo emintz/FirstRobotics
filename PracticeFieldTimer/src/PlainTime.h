@@ -31,10 +31,10 @@
 
 class PlainTime : public BaseTime {
 public:
-  PlainTime();
-  virtual ~PlainTime();
+  PlainTime() = default;;
+  ~PlainTime() override = default;
 
-  virtual void operator() (
+  void operator() (
       PullQueueHT<DisplayCommand> &command_queue,
       const DisplayCommand &command,
       LedPanel &panel) override;

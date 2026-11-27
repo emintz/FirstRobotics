@@ -30,13 +30,13 @@
 
 class SlowBlinkTime : public BaseTime {
 public:
-  SlowBlinkTime();
-  virtual ~SlowBlinkTime();
+  SlowBlinkTime() = default;
+  ~SlowBlinkTime() override = default;
 
-  virtual void operator() (
+  void operator() (
         PullQueueHT<DisplayCommand> &command_queue,
         const DisplayCommand &command,
-        LedPanel &panel);
+        LedPanel &panel) override;
 };
 
 #endif /* SLOWBLINKTIME_H_ */

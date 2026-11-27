@@ -58,7 +58,7 @@ public:
   void operator() (
       const uint8_t bitmap[32],
       const DisplayCommand::Color& foreground_color,
-      LedPanel& panel);
+      LedPanel& panel) const;
 };
 
 #endif /* SRC_TEXTDISPLAY_H_ */

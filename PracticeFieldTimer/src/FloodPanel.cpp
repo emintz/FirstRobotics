@@ -28,9 +28,6 @@
 FloodPanel::FloodPanel() {
 }
 
-FloodPanel::~FloodPanel() {
-}
-
 void FloodPanel::operator()(
     PullQueueHT<DisplayCommand> &command_queue,
     const DisplayCommand &command,

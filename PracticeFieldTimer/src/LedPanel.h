@@ -64,12 +64,12 @@ public:
   /*
    * Returns: the number of rows in the panel
    */
-  virtual int rows(void) const = 0;
+  [[nodiscard]] virtual int rows() const = 0;
 
   /*
    * Returns: the number of columns in the panel
    */
-  virtual int columns(void) const = 0;
+  [[nodiscard]] virtual int columns() const = 0;
 
   /*
    * Sets the specified panel to the specified RGB color
@@ -104,12 +104,12 @@ public:
   /*
    * Update the panel so that it displays all changes.
    */
-  virtual void update(void) = 0;
+  virtual void update() = 0;
 
   /*
    * Turn every LED in the array off. Equivalent to flood(0, 0, 0).
    */
-  virtual LedPanel& clear(void) {
+  virtual LedPanel& clear() {
     return flood(0, 0, 0);
   }
 };

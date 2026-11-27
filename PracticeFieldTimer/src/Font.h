@@ -31,7 +31,7 @@
 #define FONT_H_
 
 class Font {
-  Font() {}
+  Font() = default;
 public:
 
   /*

@@ -55,14 +55,14 @@ class ManualCountdown {
         uint16_t duration_in_seconds) :
       _countdown(countdown),
       _duration_in_seconds(duration_in_seconds),
-      _on_stop(NULL, display_command_queue) {
+      _on_stop(nullptr, display_command_queue) {
     }
   public:
 
     /**
      * Starts the count.
      */
-    virtual void apply(void) override {
+    void apply() override {
       _countdown.start_after_delay_from_ISR(_duration_in_seconds, &_on_stop);
     }
   };
@@ -101,7 +101,7 @@ public:
    * an event sequence that eventually starts the countdown that is
    * bound to this instance.
    */
-  boolean start(void);
+  boolean start();
 };
 
 #endif /* MANUALCOUNTDOWN_H_ */

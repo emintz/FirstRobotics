@@ -26,8 +26,8 @@
 #include <Arduino.h>
 
 
-void ShowNoTimeRemaining::apply(void) {
-  DisplayCommand command;
+void ShowNoTimeRemaining::apply() {
+  DisplayCommand command{};
   memset(&command, 0, sizeof(DisplayCommand));
   command.command = DisplayCommand::Pattern::PLAIN_TIME;
   command.foreground.red = 63;

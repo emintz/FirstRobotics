@@ -29,9 +29,6 @@
 
 #include "DisplayDriver.h"
 
-#include "CanBus.h"
-#include "CanPayload.h"
-
 class LedPanel;
 
 class FloodPanel final : public DisplayDriver {
@@ -39,7 +36,7 @@ class FloodPanel final : public DisplayDriver {
 public:
   FloodPanel();
 
-  virtual ~FloodPanel();
+  ~FloodPanel() override = default;
 
   /*
    * Floods the display panel with the color specified in an incoming
@@ -56,7 +53,7 @@ public:
    * command              What to display
    * panel                The display panel, the display command's target.
    */
-  virtual void operator() (
+  void operator() (
       PullQueueHT<DisplayCommand> &command_queue,
       const DisplayCommand &command,
       LedPanel &panel) override;

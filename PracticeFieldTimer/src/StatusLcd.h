@@ -80,13 +80,13 @@ public:
    */
   StatusLcd(
     PullQueueHT<LcdMessage>& status_message_queue);
-  virtual ~StatusLcd();
+  virtual ~StatusLcd() = default;
 
   /*
    * Displays the mode status as "Auto". Invoke this when the timer
    * is configured to run countdown cycles continuously.
    */
-  void automatic_mode(void) const;
+  void automatic_mode() const;
 
   /*
    * Display the CAN bus status.
@@ -101,13 +101,13 @@ public:
   /**
    * Clear the display.
    */
-  void clear(void) const;
+  void clear() const;
 
   /*
    * Display follower status. Invoke this when the timer follows a
    * leader, i.e. a time provider.
    */
-  void follow_mode(void) const;
+  void follow_mode() const;
 
   /*
    * Display the system's general health
@@ -124,7 +124,7 @@ public:
    * display is configured so that the user has to start each
    * countdown cycle.
    */
-  void manual_mode(void) const;
+  void manual_mode() const;
 
   /*
    * Display the WiFi password during configuration

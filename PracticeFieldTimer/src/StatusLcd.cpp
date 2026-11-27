@@ -82,22 +82,18 @@ StatusLcd::StatusLcd(
     status_message_queue_(status_message_queue) {
 }
 
-StatusLcd::~StatusLcd() {
-}
-
 void StatusLcd::automatic_mode() const {
   display_mode("Auto");
 }
 
 void StatusLcd::can_bus_status(const char *message) const {
-  char buffer[22];
-  memset(buffer, '\0', sizeof(buffer));
+  char buffer[22] = {};
   strcpy(buffer, "CAN ");
   strncat(buffer, message, CAN_STATUS_LENGTH - 4);
   display(CAN_STATUS_COLUMN, CAN_STATUS_ROW, buffer);
 }
 
-void StatusLcd::clear(void) const {
+void StatusLcd::clear() const {
   LcdMessage clear_command;
   clear_command.command = LcdMessage::Command::CLEAR_SCREEN;
   send(clear_command);
@@ -126,8 +122,7 @@ void StatusLcd::ssid(const char *ssid) const {
 }
 
 void StatusLcd::time(uint16_t time_remaining) const {
-  char formatted_time[10];
-  memset(formatted_time, '\0', sizeof(formatted_time));
+  char formatted_time[10] = {};
   uint16_t seconds = time_remaining % 60;
   uint16_t minutes = time_remaining / 60;
   memset(formatted_time, 0, sizeof(formatted_time));

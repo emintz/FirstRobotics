@@ -27,7 +27,7 @@
 void TextDisplay::operator () (
     const uint8_t *bitmap,
     const DisplayCommand::Color& foreground_color,
-    LedPanel& panel) {
+    LedPanel& panel) const {
   panel.clear();
   for (int column = 0; column < 32; ++column) {
     uint8_t current_char = *bitmap++;

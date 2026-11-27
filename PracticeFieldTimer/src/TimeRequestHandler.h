@@ -26,7 +26,6 @@
 #ifndef TIMEREQUESTHANDLER_H_
 #define TIMEREQUESTHANDLER_H_
 
-#include <string>
 #include <WebServer.h>
 
 class TimeRequestHandler {
@@ -37,7 +36,7 @@ public:
   }
   virtual ~TimeRequestHandler() = default;
 
-  const char *get_class_name() {
+  [[nodiscard]] const char *get_class_name() const {
     return class_name;
   }
 

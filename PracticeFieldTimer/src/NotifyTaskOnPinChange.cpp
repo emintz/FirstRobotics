@@ -42,9 +42,6 @@ NotifyTaskOnPinChange::NotifyTaskOnPinChange(
             &notifier_function) {
 }
 
-NotifyTaskOnPinChange::~NotifyTaskOnPinChange() {
-}
-
 bool NotifyTaskOnPinChange::start(void) {
   return task_to_notify.start()
       && change_detector.start();

@@ -25,7 +25,7 @@
 
 #include "PinAssignments.h"
 
-WS2812B8x32vertical::LedIndexer::LedIndexer(void) {
+WS2812B8x32vertical::LedIndexer::LedIndexer() {
   int16_t current_offset = 256;
   for (int i = 0; i < 32; ++i) {
     current_offset -= ((i & 1) ? 15 : 1);
@@ -44,17 +44,14 @@ WS2812B8x32vertical::LedIndexer WS2812B8x32vertical::row_column_to_index;
 
 WS2812B8x32vertical::WS2812B8x32vertical() {
   clear();
-  FastLED.addLeds<WS2812, LED_ARRAY_PIN, GRB>(leds, 256);
+  CFastLED::addLeds<WS2812, LED_ARRAY_PIN, GRB>(leds, 256);
 }
 
-WS2812B8x32vertical::~WS2812B8x32vertical() {
-}
-
-int WS2812B8x32vertical::rows(void) const {
+int WS2812B8x32vertical::rows() const {
   return 8;
 }
 
-int WS2812B8x32vertical::columns(void) const {
+int WS2812B8x32vertical::columns() const {
   return 32;
 }
 
@@ -74,13 +71,13 @@ LedPanel& WS2812B8x32vertical::set(int row, int column, int red, int green, int 
 LedPanel& WS2812B8x32vertical::flood(int red, int green, int blue) {
   CRGB fill_color(red, green, blue);
 
-  for (int offset = 0; offset < 256; ++ offset) {
-    leds[offset] = fill_color;
+  for (auto & led : leds) {
+    led = fill_color;
   }
   return *this;
 }
 
-void WS2812B8x32vertical::update(void) {
+void WS2812B8x32vertical::update() {
   vTaskDelay(pdMS_TO_TICKS(1));
   FastLED.show();
 

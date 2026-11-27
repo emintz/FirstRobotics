@@ -62,7 +62,7 @@ class WS2812B8x32vertical : public LedPanel {
 
     int16_t column_offset[32];
 
-    LedIndexer(void);
+    LedIndexer();
 
     /*
      * Translates a (row, column) pair into an offset, as explained
@@ -78,7 +78,7 @@ class WS2812B8x32vertical : public LedPanel {
      *
      * Returns: the corresponding offset.
      */
-    int16_t offset_of(int row, int column) const;
+    [[nodiscard]] int16_t offset_of(int row, int column) const;
   };
 
   static LedIndexer row_column_to_index;
@@ -87,20 +87,20 @@ class WS2812B8x32vertical : public LedPanel {
 
 public:
   WS2812B8x32vertical();
-  virtual ~WS2812B8x32vertical();
+  ~WS2812B8x32vertical() override = default;
 
 
   /*
    * Returns: the number of rows in the panel
    */
-  virtual int rows(void) const;
+  [[nodiscard]] int rows() const override;
 
   /*
    * Returns: the number of columns in the panel
    */
-  virtual int columns(void) const;
+  [[nodiscard]] int columns() const override;
 
-  virtual LedPanel& flood(int red, int green, int blue);
+  LedPanel& flood(int red, int green, int blue) override;
 
   /*
    * Sets the specified panel to the specified RGB color
@@ -116,7 +116,7 @@ public:
    * green             Green brightness, typically in [0 .. 255]
    * blue              Blue brightness, typically in [0 .. 255]
    */
-  LedPanel& set(int row, int column, int red, int green, int blue);
+  LedPanel& set(int row, int column, int red, int green, int blue) override;
 
   /*
    * Set every LED in the panel to the specified LED color.
@@ -134,7 +134,7 @@ public:
   /*
    * Update the panel so that it displays all changes.
    */
-  virtual void update(void);
+  void update() override;
 };
 
 #endif /* WS2812B8X32VERTICAL_H_ */

@@ -39,7 +39,7 @@ ManualCountdown::ManualCountdown(
 
 }
 
-bool ManualCountdown::start(void) {
+bool ManualCountdown::start() {
   return _countdown_start_detector.start();
 }
 

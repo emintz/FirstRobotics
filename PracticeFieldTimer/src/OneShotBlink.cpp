@@ -23,8 +23,8 @@
 
 #include "OneShotBlink.h"
 
-void OneShotBlink::run(void) {
-  OneShotBlinkCommand command;
+void OneShotBlink::run() {
+  OneShotBlinkCommand command{};
   for (;;) {
     memset(&command, '\0', sizeof(command));
     if (_command_queue.pull_message(&command)

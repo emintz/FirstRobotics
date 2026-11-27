@@ -58,7 +58,7 @@ public:
   TimeChangeHandler(
       PullQueueHT<DisplayCommand>& panel_command_queue,
       PullQueueHT<OneShotBlinkCommand>& rj45_blink_queue);
-  virtual ~TimeChangeHandler();
+  virtual ~TimeChangeHandler() = default;
 
   /*
    * Receives a time change command from the CAN bus, transforms
@@ -74,7 +74,7 @@ public:
    *                   command).
    * payload           The incoming time display command
    */
-  virtual void operator() (CanBus& bus, CanPayload& payload);
+  void operator() (CanBus& bus, CanPayload& payload) override;
 };
 
 #endif /* TIMECHANGEHANDLER_H_ */

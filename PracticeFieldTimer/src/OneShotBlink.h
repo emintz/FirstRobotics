@@ -60,10 +60,10 @@ public:
   OneShotBlink(PullQueueHT<OneShotBlinkCommand>& command_queue) :
     _command_queue(command_queue) {
   }
-  virtual ~OneShotBlink() = default;
+  ~OneShotBlink() override = default;
 
 protected:
-  virtual void run(void) override;
+  void run() override;
 };
 
 #endif /* ONESHOTBLINK_H_ */

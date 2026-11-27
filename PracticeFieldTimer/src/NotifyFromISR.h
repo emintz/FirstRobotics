@@ -45,7 +45,6 @@ public:
    * task              Task to be notified when apply() is invoked.
    */
   NotifyFromISR(BaseTaskWithAction *task);
-  virtual ~NotifyFromISR();
 
   /*
    * Notifies the task that was bound during construction.

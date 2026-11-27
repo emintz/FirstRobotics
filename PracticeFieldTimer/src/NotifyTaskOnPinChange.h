@@ -64,14 +64,14 @@ public:
       const char *task_name,
       UBaseType_t task_priority,
       TaskAction& on_change);
-  virtual ~NotifyTaskOnPinChange();
+  virtual ~NotifyTaskOnPinChange() = default;
 
   /*
    * Start the created task.
    *
    * Returns: true if and only if the task starts successfully.
    */
-  bool start(void);
+  bool start();
 };
 
 #endif /* NOTIFYTASKONPINCHANGE_H_ */
